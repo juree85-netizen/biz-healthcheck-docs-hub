@@ -6,6 +6,7 @@ import { existsSync } from 'fs';
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const docsBase = join(projectRoot, 'src', 'content', 'docs');
 const publicBase = join(projectRoot, 'public', 'html');
+const publicFiles = join(projectRoot, 'public', 'files');
 
 async function ensureTitle(filePath) {
   const content = await readFile(filePath, 'utf-8');
@@ -49,11 +50,22 @@ const htmlLabels = {
   'voc_dev_request.html': 'VoC 인터페이스 개발 요청서',
 };
 
+const xlsxLabels = {
+  'efficiency_profit_dev_request.xlsx': '효율/수익 지표 개발 요청서 (Excel)',
+};
+
 // HTML 링크 페이지 생성
-async function createHtmlIndexPage(htmlFiles) {
+async function createHtmlIndexPage(htmlFiles, xlsxFiles) {
   const links = htmlFiles
     .map(f => `- [${htmlLabels[basename(f)] || basename(f, '.html')}](/html/${basename(f)})`)
     .join('\n');
+
+  const xlsxLinks = xlsxFiles.length > 0
+    ? `\n## 엑셀 파일 다운로드\n\n` + xlsxFiles
+        .map(f => `- [${xlsxLabels[basename(f)] || basename(f)}](/files/${basename(f)})`)
+        .join('\n')
+    : '';
+
   const content = `---
 title: HTML 문서 목록
 description: 와이어프레임 및 개발 요청서 HTML 파일 링크
@@ -62,6 +74,7 @@ description: 와이어프레임 및 개발 요청서 HTML 파일 링크
 아래 링크에서 각 HTML 문서를 열 수 있습니다.
 
 ${links}
+${xlsxLinks}
 `;
   const indexDir = join(docsBase, 'html-docs');
   await mkdir(indexDir, { recursive: true });
@@ -92,11 +105,22 @@ async function run() {
     }
   }
 
+  // Excel 파일 수집
+  await mkdir(publicFiles, { recursive: true });
+  const xlsxFiles = [];
+  const allEntries = await readdir('/home/ubuntu');
+  for (const name of allEntries) {
+    if (!name.endsWith('.xlsx')) continue;
+    await cp(join('/home/ubuntu', name), join(publicFiles, name));
+    xlsxFiles.push(name);
+  }
+
   // HTML 인덱스 페이지 생성
-  await createHtmlIndexPage(htmlFiles);
+  await createHtmlIndexPage(htmlFiles, xlsxFiles);
 
   console.log(`✔ MD 파일 수집 완료`);
   console.log(`✔ HTML 파일 ${htmlFiles.length}개 → public/html/`);
+  console.log(`✔ Excel 파일 ${xlsxFiles.length}개 → public/files/`);
   console.log(`✔ HTML 인덱스 페이지 생성`);
 }
 
