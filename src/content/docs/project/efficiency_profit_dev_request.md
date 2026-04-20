@@ -19,8 +19,7 @@ title: 효율/수익 지표 개발 요청서
 
 | 구분 | 내용 |
 |------|------|
-| 신규 산출 로직 | ARPA · 이탈률 · LTV · CAC · LTV:CAC · CAC Payback |
-| 마스터 데이터 | 상품 필터용 상품 목록 제공 요청 |
+| 신규 산출 로직 | LTV · CAC · LTV:CAC Ratio · CAC Payback Period |
 | 화면 | Tableau 기 구현 — 본 요청 범위 제외 (와이어프레임 별도 제공 예정) |
 
 ---
