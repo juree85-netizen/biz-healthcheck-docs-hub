@@ -13,7 +13,7 @@ const mdAttachments = {
   'voc_interface_request.md': [
     { label: 'Excel 다운로드', file: 'voc_interface_request.xlsx' },
   ],
-  'efficiency_profit_indicators.md': [
+  'efficiency_profit_dev_request.md': [
     { label: 'Excel 다운로드', file: 'efficiency_profit_dev_request.xlsx' },
   ],
 };

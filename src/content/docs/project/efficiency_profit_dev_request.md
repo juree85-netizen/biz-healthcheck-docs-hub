@@ -239,3 +239,10 @@ title: 효율/수익 지표 개발 요청서
 | 담당자 | 미정 |
 | 부서 | 솔루션사업부 기획팀 |
 | 연락처 | 미정 |
+
+
+---
+
+## 첨부 파일
+
+- [📥 Excel 다운로드](/files/efficiency_profit_dev_request.xlsx)
