@@ -278,7 +278,8 @@
     <table>
       <thead><tr><th>항목</th><th>내용</th></tr></thead>
       <tbody>
-        <tr><td>산식</td><td><code>ARPA ÷ 이탈률</code></td></tr>
+        <tr><td>산식 (이론)</td><td><code>(Recurring 매출 ÷ 이탈률) + (연 일회성 매출 ÷ 고객 수)</code></td></tr>
+        <tr><td>실무 적용 산식</td><td><code>(sum(l_sap.orderlist.vf219) ÷ 이탈률) + (연 일회성 매출 ÷ 고객 수)</code><br>※ RC/NRC 데이터 분리 불가로 vf219 전체를 Recurring으로 간주</td></tr>
         <tr><td>적용 상품</td><td>EMS / EMS(All) 제외 전 상품</td></tr>
         <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
         <tr><td>단위</td><td>억원</td></tr>
