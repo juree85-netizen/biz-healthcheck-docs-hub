@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[개발 요청] VoC 건별 데이터 수신 테이블 및 스냅샷 테이블 개발</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 13px; color: #1A1A1A;
+    background: #F7F8FA;
+    padding: 40px 20px;
+    line-height: 1.7;
+  }
+  .doc-wrap {
+    max-width: 860px; margin: 0 auto;
+    background: #fff;
+    border: 1px solid #E0E4EA;
+    border-radius: 8px;
+    padding: 48px 56px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  /* 제목 영역 */
+  .doc-header {
+    border-bottom: 2px solid #1E3079;
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+  .doc-title {
+    font-size: 20px; font-weight: 700; color: #1E3079;
+    margin-bottom: 14px;
+  }
+  .doc-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .doc-meta-item { font-size: 12px; color: #555; }
+  .doc-meta-item strong { color: #1A1A1A; }
+
+  /* 섹션 */
+  .section { margin-bottom: 36px; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: #1E3079;
+    background: #EEF2FB;
+    padding: 7px 14px;
+    border-left: 4px solid #1E3079;
+    margin-bottom: 14px;
+    border-radius: 0 4px 4px 0;
+  }
+  .sub-title {
+    font-size: 13px; font-weight: 700; color: #333;
+    margin: 18px 0 8px;
+    padding-left: 8px;
+    border-left: 3px solid #89B2F7;
+  }
+
+  /* 본문 텍스트 */
+  p { margin-bottom: 10px; }
+  .note {
+    background: #FFFBEA; border: 1px solid #F0D060;
+    border-radius: 4px; padding: 10px 14px;
+    font-size: 12px; color: #7A6000;
+    margin: 10px 0;
+  }
+  .note strong { color: #5A4500; }
+
+  /* 표 */
+  table {
+    width: 100%; border-collapse: collapse;
+    margin-bottom: 14px; font-size: 12px;
+  }
+  th {
+    background: #F0F4FB; color: #1E3079;
+    font-weight: 700; text-align: center;
+    padding: 8px 12px;
+    border: 1px solid #D0D8E8;
+  }
+  td {
+    padding: 7px 12px;
+    border: 1px solid #E2E6EE;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #F8FAFD; }
+  td code {
+    background: #EEF2FB; color: #1E3079;
+    padding: 1px 5px; border-radius: 3px;
+    font-size: 11px; font-family: 'Courier New', monospace;
+  }
+
+  /* 코드 블록 */
+  pre {
+    background: #F4F6FA; border: 1px solid #DDE2EC;
+    border-radius: 4px; padding: 14px 16px;
+    font-size: 12px; font-family: 'Courier New', monospace;
+    color: #1A1A1A; line-height: 1.8;
+    margin: 8px 0 14px;
+    overflow-x: auto;
+  }
+
+  /* 데이터 흐름 다이어그램 */
+  .flow-box {
+    background: #F0F4FB; border: 1px solid #C8D4EC;
+    border-radius: 6px; padding: 20px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; line-height: 2;
+    color: #1A1A1A;
+  }
+  .flow-box .flow-api   { color: #1E3079; font-weight: 700; }
+  .flow-box .flow-table { color: #27AE60; font-weight: 700; }
+  .flow-box .flow-snap  { color: #E67E22; font-weight: 700; }
+  .flow-box .flow-arrow { color: #999; }
+  .flow-box .flow-comment { color: #888; font-style: italic; }
+
+  /* 페이지 번호 / 푸터 */
+  .doc-footer {
+    margin-top: 40px; padding-top: 16px;
+    border-top: 1px solid #E0E4EA;
+    font-size: 11px; color: #9CA3AF;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="doc-wrap">
+
+  <!-- 문서 헤더 -->
+  <div class="doc-header">
+    <div class="doc-title">[개발 요청] VoC 건별 데이터 수신 테이블 및 스냅샷 테이블 개발</div>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>요청 일자</strong>&nbsp;&nbsp;2026-04-17</div>
+      <div class="doc-meta-item"><strong>요청 부서</strong>&nbsp;&nbsp;솔루션사업부 기획팀</div>
+      <div class="doc-meta-item"><strong>요청 대상</strong>&nbsp;&nbsp;개발팀</div>
+    </div>
+  </div>
+
+  <!-- 1. 요청 배경 -->
+  <div class="section">
+    <div class="section-title">1. 요청 배경</div>
+    <p>현재 <code>solution_if_voc</code> 테이블을 통해 CS 대시보드로부터 VoC 건수·불만건수·실사용자수 3개 지표를 <strong>월별 집계(CNT) 형태</strong>로 수신하고 있습니다.</p>
+    <p>사업건전성 대시보드 고도화를 위해 아래 3개 신규 지표 산출이 필요하나, 기존 월별 집계 데이터로는 산출이 불가합니다.</p>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>신규 지표</th><th>기존 데이터로 산출 불가 이유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>접수월별 개선 요청 건수</td><td>요구유형 필드 없음</td></tr>
+        <tr><td style="text-align:center">2</td><td>접수월별 평균 처리 리드타임</td><td>건별 요청·완료 일시 없음</td></tr>
+        <tr><td style="text-align:center">3</td><td>월별 지연 건수</td><td>건별 예정·완료 일시 없음</td></tr>
+      </tbody>
+    </table>
+    <p>이에 CS 대시보드로부터 <strong>건별 원천 데이터를 수신·저장하는 신규 테이블</strong>과, 시점에 따라 값이 변하는 지표를 고정 관리하기 위한 <strong>스냅샷 테이블</strong> 개발을 요청합니다.</p>
+    <div class="note">
+      ※ CS 대시보드 측 신규 API 개발은 CS팀에 별도 요청 예정입니다. 본 요청은 해당 API로부터 데이터를 수신하여 저장·가공하는 <strong>당사 내부 개발 범위</strong>입니다.
+    </div>
+  </div>
+
+  <!-- 2. 요청 사항 요약 -->
+  <div class="section">
+    <div class="section-title">2. 요청 사항 요약</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>구분</th><th>내용</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>기존 테이블</td><td><code>solution_if_voc</code> — <strong>현행 유지 (변경 없음)</strong></td></tr>
+        <tr><td style="text-align:center">2</td><td>신규 개발 ①</td><td><code>solution_if_voc_detail</code> — CS 건별 데이터 수신 및 저장 배치 개발</td></tr>
+        <tr><td style="text-align:center">3</td><td>신규 개발 ②</td><td><code>sol_if_voc_snap</code> — 월별 지표 스냅샷 테이블 생성 및 집계 배치 개발</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. solution_if_voc_detail -->
+  <div class="section">
+    <div class="section-title">3. 신규 개발 ① &nbsp;<code>solution_if_voc_detail</code></div>
+
+    <div class="sub-title">3-1. 테이블 역할</div>
+    <p>CS 대시보드 건별 원천 데이터를 수신하여 저장하는 테이블. 솔루션사업부가 직접 집계·분석하여 신규 지표를 산출하는 기반 데이터로 활용합니다.</p>
+
+    <div class="sub-title">3-2. 테이블 필드 (16개)</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>필드명</th><th>설명</th><th>샘플값</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>기준월</td><td>요청일자 기준 월</td><td>2026-03</td></tr>
+        <tr><td style="text-align:center">2</td><td>VOC ID</td><td>VoC 고유 식별자</td><td>2603019000025950</td></tr>
+        <tr><td style="text-align:center">3</td><td>요청일자</td><td>VoC 접수 일시</td><td>2026-03-01 00:01:36</td></tr>
+        <tr><td style="text-align:center">4</td><td>예정일자</td><td>처리 예정 기한</td><td>2026-03-03 00:01:36</td></tr>
+        <tr><td style="text-align:center">5</td><td>완료일자</td><td>처리 완료 일시 (미완료건 null)</td><td>2026-03-01 00:09:40</td></tr>
+        <tr><td style="text-align:center">6</td><td>리드타임(시간)</td><td>완료일자 - 요청일자 (완료건만)</td><td>0.13</td></tr>
+        <tr><td style="text-align:center">7</td><td>진행단계</td><td>완료/미완료 구분</td><td>완료 / 미완료</td></tr>
+        <tr><td style="text-align:center">8</td><td>상품/서비스</td><td>대상 상품명</td><td>Knox Portal 등</td></tr>
+        <tr><td style="text-align:center">9</td><td>처리구분</td><td>처리 선 구분</td><td>1선 / 2선 / 3선</td></tr>
+        <tr><td style="text-align:center">10</td><td>접수채널</td><td>VoC 접수 경로</td><td>CALL / CHAT / E-MAIL / WEB</td></tr>
+        <tr><td style="text-align:center">11</td><td>요구유형</td><td>VoC 요구 유형</td><td>개선 / 문의 / 오류 / 기타</td></tr>
+        <tr><td style="text-align:center">12</td><td>대내외구분</td><td>고객 대내외 구분</td><td>대내 / 대외</td></tr>
+        <tr><td style="text-align:center">13</td><td>상담유형(대)</td><td>상담 유형 대분류</td><td>등록 / 접속 / 사용 등</td></tr>
+        <tr><td style="text-align:center">14</td><td>상담유형(중)</td><td>상담 유형 중분류</td><td></td></tr>
+        <tr><td style="text-align:center">15</td><td>상담유형(소)</td><td>상담 유형 소분류</td><td></td></tr>
+        <tr><td style="text-align:center">16</td><td>고객사</td><td>고객사명</td><td>삼성전자 등</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">3-3. 데이터 적재 조건</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>항목</th><th>내용</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>제공 범위</td><td>2023년 1월 ~ 수신 시점 당월</td></tr>
+        <tr><td style="text-align:center">2</td><td>배치 주기</td><td>매월 1회</td></tr>
+        <tr><td style="text-align:center">3</td><td>적재 방식</td><td>아래 3단계 참조</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <tr><th>단계</th><th>대상 범위</th><th>방식</th><th>시점</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>① 초기 적재</td><td>2023년 1월 ~ M-2월 전체</td><td>Full 적재</td><td>최초 1회</td></tr>
+        <tr><td>② 변경분 업데이트</td><td>2023년 1월 ~ M-2월 중 변경건</td><td>변경건만 업데이트</td><td>매월</td></tr>
+        <tr><td>③ 전월 적재</td><td>M-1월 전체</td><td>Full 적재</td><td>매월</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. sol_if_voc_snap -->
+  <div class="section">
+    <div class="section-title">4. 신규 개발 ② &nbsp;<code>sol_if_voc_snap</code> (Datalake 스냅샷 테이블)</div>
+
+    <div class="sub-title">4-1. 테이블 역할</div>
+    <p>리드타임·지연건수는 계산 시점에 따라 값이 달라지는 지표이므로, 매월 고정 시점에 계산한 값을 저장하여 일관된 추이를 관리합니다.</p>
+    <div class="note">
+      ※ <strong>개선 요청 건수</strong>는 접수 시점 값이 고정되므로 스냅샷 불필요 — <code>solution_if_voc_detail</code>에서 상시 재계산합니다.
+    </div>
+
+    <div class="sub-title">4-2. 테이블 필드</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>필드명</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>기준월</td><td>지표 산출 기준 월 (예: 2026-03)</td></tr>
+        <tr><td style="text-align:center">2</td><td>스냅샷 일자</td><td>실제 계산·저장 일자 (예: 2026-04-01)</td></tr>
+        <tr><td style="text-align:center">3</td><td>상품/서비스</td><td>대상 상품명</td></tr>
+        <tr><td style="text-align:center">4</td><td>평균 리드타임(시간)</td><td>해당 기준월 완료건 기준 평균 처리 시간</td></tr>
+        <tr><td style="text-align:center">5</td><td>지연건수</td><td>해당 기준월 기준 지연 건수</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">4-3. 집계 산출식</div>
+    <p><strong>평균 리드타임</strong></p>
+<pre>평균 리드타임(M월) =
+  SUM(완료일자 - 요청일자)
+  ÷ COUNT(VOC_ID)
+  WHERE 기준월 = M
+    AND 진행단계 = '완료'
+    AND 상품/서비스 = [상품명]</pre>
+
+    <p><strong>지연건수</strong></p>
+<pre>지연건수(M월) = COUNT(VOC_ID)
+WHERE 상품/서비스 = [상품명]
+  AND (
+    완료일자 > 예정일자                             -- 완료됐으나 기한 초과한 건
+    OR (완료일자 IS NULL AND 예정일자 &lt; M월 말일)   -- 미완료이며 기한이 지난 건
+  )</pre>
+
+    <div class="sub-title">4-4. 배치 적재 조건</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>항목</th><th>내용</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>산출 시점</td><td>매월 1일</td></tr>
+        <tr><td style="text-align:center">2</td><td>산출 기준</td><td>M-1월 기준 계산</td></tr>
+        <tr><td style="text-align:center">3</td><td>적재 방식</td><td>M-1월 계산값을 1행씩 추가 적재 (기존 누적 데이터 유지)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. 데이터 흐름 -->
+  <div class="section">
+    <div class="section-title">5. 참고: 데이터 흐름 구조</div>
+    <div class="flow-box">
+      <span class="flow-api">CS 대시보드 API</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ (매월 배치 수신)</span><br>
+      <span class="flow-table">solution_if_voc_detail</span><span class="flow-comment">&nbsp;&nbsp;← 건별 원천 데이터 저장</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─▶ 개선 요청 건수</span><span class="flow-comment">&nbsp;&nbsp;(상시 재계산, 스냅샷 불필요)</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ (매월 1일 집계 배치)</span><br>
+      <span class="flow-snap">sol_if_voc_snap</span><span class="flow-comment">&nbsp;&nbsp;← 리드타임 / 지연건수 고정값 저장</span>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    솔루션사업부 기획팀 · 2026-04-17
+  </div>
+
+</div>
+</body>
+</html>

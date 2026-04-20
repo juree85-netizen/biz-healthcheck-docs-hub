@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>VoC 대시보드 와이어프레임</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Malgun Gothic', Arial, sans-serif; background: #f0f2f5; color: #333; font-size: 13px; }
+
+    /* 헤더 */
+    .page-header {
+      background: #1e2a3a;
+      color: #fff;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+    .page-header .sub { font-size: 11px; color: #8899aa; margin-top: 3px; }
+    .product-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .product-filter label { color: #aab; }
+    .dropdown {
+      background: #2d3e52;
+      border: 1px solid #445;
+      color: #dde;
+      border-radius: 4px;
+      padding: 5px 22px 5px 10px;
+      font-size: 12px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23889'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      cursor: pointer;
+    }
+
+    /* 페이지 컨텐츠 */
+    .page { padding: 20px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* 카드 */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e0e4ea;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .card-header {
+      padding: 14px 20px 10px;
+      border-bottom: 1px solid #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #1e2a3a; }
+    .card-filter { display: flex; align-items: center; gap: 8px; }
+    .card-filter label { font-size: 11px; color: #888; }
+    .card-body { padding: 16px 20px; }
+
+    /* 차트 2열 */
+    .chart-row { display: flex; gap: 16px; }
+    .chart-col { flex: 1; min-width: 0; }
+    .chart-subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    /* KPI 미니 카드 */
+    .kpi-mini-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .kpi-mini {
+      flex: 1;
+      background: #f7f8fb;
+      border: 1px solid #e4e8ef;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .kpi-mini .km-label { font-size: 10px; color: #999; margin-bottom: 4px; }
+    .kpi-mini .km-value { font-size: 18px; font-weight: 700; color: #1e2a3a; }
+    .kpi-mini .km-unit { font-size: 11px; color: #777; margin-left: 2px; }
+    .kpi-mini .km-change { font-size: 11px; margin-top: 3px; }
+    .km-change.neg { color: #3aa876; }
+    .km-change.pos { color: #d9534f; }
+
+    /* 범례 */
+    .legend-row { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
+    .legend-line { width: 22px; height: 3px; border-radius: 2px; }
+    .legend-bar-box { width: 12px; height: 12px; border-radius: 2px; }
+
+    /* SVG 차트 공통 */
+    svg { display: block; width: 100%; }
+    .axis-label { font-size: 9px; fill: #bbb; }
+    .grid-line { stroke: #f0f0f0; stroke-width: 1; }
+    .grid-line-dash { stroke: #ebebeb; stroke-width: 1; stroke-dasharray: 4,3; }
+
+    /* 와이어프레임 라벨 */
+    .wf-badge {
+      display: inline-block;
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      font-size: 10px;
+      border-radius: 3px;
+      padding: 2px 7px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 페이지 헤더 -->
+<div class="page-header">
+  <div>
+    <h1>고객·상품 영역 현황 <span style="font-weight:400; color:#8899aa; font-size:13px;">— VoC 지표</span></h1>
+    <div class="sub">신규 요청 데이터 활용 차트 와이어프레임 (수치는 예시)</div>
+  </div>
+  <div class="product-filter">
+    <label>상품</label>
+    <select class="dropdown">
+      <option>전체</option>
+      <option>Knox Portal</option>
+      <option>EMM</option>
+      <option>Brity RPA</option>
+    </select>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ===== 카드 3: VoC 유형별 분석 ===== -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">VoC 유형별 분석 <span class="wf-badge">신규 RAW 데이터 필요</span></div>
+      <div class="card-filter">
+        <label>분석주기</label>
+        <select class="dropdown">
+          <option>Month</option>
+          <option>Quarter</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-row">
+
+        <!-- 차트 7: 오류 건수 및 비중 -->
+        <div class="chart-col">
+          <div class="chart-subtitle">VoC 오류 건수 및 비중</div>
+          <div class="legend-row">
+            <div class="legend-item"><div class="legend-bar-box" style="background:#7b9ef7"></div>전체 건수</div>
+            <div class="legend-item"><div class="legend-bar-box" style="background:#e07b7b"></div>오류 건수</div>
+            <div class="legend-item"><div class="legend-line" style="background:#c0392b"></div>오류 비중(%)</div>
+          </div>
+          <svg viewBox="0 0 380 180">
+            <!-- 축 -->
+            <line x1="45" y1="10" x2="45" y2="140" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="140" x2="370" y2="140" stroke="#ddd" stroke-width="1"/>
+            <!-- 그리드 -->
+            <line x1="45" y1="50" x2="370" y2="50" class="grid-line-dash"/>
+            <line x1="45" y1="90" x2="370" y2="90" class="grid-line-dash"/>
+            <!-- Y축 좌 -->
+            <text x="40" y="143" class="axis-label" text-anchor="end">0</text>
+            <text x="40" y="93" class="axis-label" text-anchor="end">500</text>
+            <text x="40" y="53" class="axis-label" text-anchor="end">1000</text>
+            <!-- Y축 우 (비중%) -->
+            <text x="375" y="143" class="axis-label">0%</text>
+            <text x="375" y="93" class="axis-label">25%</text>
+            <text x="375" y="53" class="axis-label">50%</text>
+            <!-- 막대 그룹 (분기별 6개) -->
+            <!-- Q1 2024 -->
+            <rect x="55" y="60" width="16" height="80" fill="#c5d5f9" rx="2"/>
+            <rect x="73" y="95" width="16" height="45" fill="#e07b7b" rx="2"/>
+            <!-- Q2 2024 -->
+            <rect x="110" y="55" width="16" height="85" fill="#c5d5f9" rx="2"/>
+            <rect x="128" y="93" width="16" height="47" fill="#e07b7b" rx="2"/>
+            <!-- Q3 2024 -->
+            <rect x="165" y="50" width="16" height="90" fill="#7b9ef7" rx="2"/>
+            <rect x="183" y="90" width="16" height="50" fill="#e07b7b" rx="2"/>
+            <!-- Q4 2024 -->
+            <rect x="220" y="48" width="16" height="92" fill="#7b9ef7" rx="2"/>
+            <rect x="238" y="88" width="16" height="52" fill="#d9534f" rx="2"/>
+            <!-- Q1 2025 -->
+            <rect x="275" y="52" width="16" height="88" fill="#7b9ef7" rx="2"/>
+            <rect x="293" y="92" width="16" height="48" fill="#d9534f" rx="2"/>
+            <!-- Q2 2025 -->
+            <rect x="330" y="45" width="16" height="95" fill="#7b9ef7" rx="2"/>
+            <rect x="348" y="88" width="16" height="52" fill="#d9534f" rx="2"/>
+            <!-- 비중 선 -->
+            <polyline points="81,95 136,93 191,85 246,80 301,82 356,78"
+              fill="none" stroke="#c0392b" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="81" cy="95" r="3" fill="#c0392b"/>
+            <circle cx="136" cy="93" r="3" fill="#c0392b"/>
+            <circle cx="191" cy="85" r="3" fill="#c0392b"/>
+            <circle cx="246" cy="80" r="3" fill="#c0392b"/>
+            <circle cx="301" cy="82" r="3" fill="#c0392b"/>
+            <circle cx="356" cy="78" r="3" fill="#c0392b"/>
+            <!-- X축 라벨 -->
+            <text x="72" y="155" class="axis-label" text-anchor="middle">24.Q1</text>
+            <text x="127" y="155" class="axis-label" text-anchor="middle">24.Q2</text>
+            <text x="182" y="155" class="axis-label" text-anchor="middle">24.Q3</text>
+            <text x="237" y="155" class="axis-label" text-anchor="middle">24.Q4</text>
+            <text x="292" y="155" class="axis-label" text-anchor="middle">25.Q1</text>
+            <text x="347" y="155" class="axis-label" text-anchor="middle">25.Q2</text>
+          </svg>
+        </div>
+
+        <!-- 구분선 -->
+        <div style="width:1px; background:#f0f0f0; margin: 0 4px;"></div>
+
+        <!-- 차트 8: 개선 건수 및 비중 -->
+        <div class="chart-col">
+          <div class="chart-subtitle">VoC 개선 건수 및 비중</div>
+          <div class="legend-row">
+            <div class="legend-item"><div class="legend-bar-box" style="background:#7b9ef7"></div>전체 건수</div>
+            <div class="legend-item"><div class="legend-bar-box" style="background:#5cba8a"></div>개선 건수</div>
+            <div class="legend-item"><div class="legend-line" style="background:#27ae60"></div>개선 비중(%)</div>
+          </div>
+          <svg viewBox="0 0 380 180">
+            <line x1="45" y1="10" x2="45" y2="140" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="140" x2="370" y2="140" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="50" x2="370" y2="50" class="grid-line-dash"/>
+            <line x1="45" y1="90" x2="370" y2="90" class="grid-line-dash"/>
+            <text x="40" y="143" class="axis-label" text-anchor="end">0</text>
+            <text x="40" y="93" class="axis-label" text-anchor="end">500</text>
+            <text x="40" y="53" class="axis-label" text-anchor="end">1000</text>
+            <text x="375" y="143" class="axis-label">0%</text>
+            <text x="375" y="93" class="axis-label">25%</text>
+            <text x="375" y="53" class="axis-label">50%</text>
+            <!-- 막대 -->
+            <rect x="55" y="60" width="16" height="80" fill="#c5d5f9" rx="2"/>
+            <rect x="73" y="100" width="16" height="40" fill="#5cba8a" rx="2"/>
+            <rect x="110" y="55" width="16" height="85" fill="#c5d5f9" rx="2"/>
+            <rect x="128" y="96" width="16" height="44" fill="#5cba8a" rx="2"/>
+            <rect x="165" y="50" width="16" height="90" fill="#7b9ef7" rx="2"/>
+            <rect x="183" y="93" width="16" height="47" fill="#5cba8a" rx="2"/>
+            <rect x="220" y="48" width="16" height="92" fill="#7b9ef7" rx="2"/>
+            <rect x="238" y="90" width="16" height="50" fill="#5cba8a" rx="2"/>
+            <rect x="275" y="52" width="16" height="88" fill="#7b9ef7" rx="2"/>
+            <rect x="293" y="88" width="16" height="52" fill="#5cba8a" rx="2"/>
+            <rect x="330" y="45" width="16" height="95" fill="#7b9ef7" rx="2"/>
+            <rect x="348" y="85" width="16" height="55" fill="#5cba8a" rx="2"/>
+            <!-- 비중 선 -->
+            <polyline points="81,100 136,96 191,88 246,83 301,80 356,76"
+              fill="none" stroke="#27ae60" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="81" cy="100" r="3" fill="#27ae60"/>
+            <circle cx="136" cy="96" r="3" fill="#27ae60"/>
+            <circle cx="191" cy="88" r="3" fill="#27ae60"/>
+            <circle cx="246" cy="83" r="3" fill="#27ae60"/>
+            <circle cx="301" cy="80" r="3" fill="#27ae60"/>
+            <circle cx="356" cy="76" r="3" fill="#27ae60"/>
+            <text x="72" y="155" class="axis-label" text-anchor="middle">24.Q1</text>
+            <text x="127" y="155" class="axis-label" text-anchor="middle">24.Q2</text>
+            <text x="182" y="155" class="axis-label" text-anchor="middle">24.Q3</text>
+            <text x="237" y="155" class="axis-label" text-anchor="middle">24.Q4</text>
+            <text x="292" y="155" class="axis-label" text-anchor="middle">25.Q1</text>
+            <text x="347" y="155" class="axis-label" text-anchor="middle">25.Q2</text>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== 카드 4: VoC 처리 지표 ===== -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">VoC 처리 지표 <span class="wf-badge">신규 RAW 데이터 필요</span></div>
+      <div class="card-filter">
+        <label>분석주기</label>
+        <select class="dropdown">
+          <option>Month</option>
+          <option>Quarter</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-row">
+
+        <!-- 차트 9: 리드타임 -->
+        <div class="chart-col">
+          <div class="chart-subtitle">VoC 처리 리드타임</div>
+          <!-- KPI 미니 카드 -->
+          <div class="kpi-mini-row">
+            <div class="kpi-mini">
+              <div class="km-label">Last Month</div>
+              <div class="km-value">9.7<span class="km-unit">시간</span></div>
+              <div class="km-change neg">▼ 전월 대비 -1.2h</div>
+            </div>
+            <div class="kpi-mini">
+              <div class="km-label">YTM Average</div>
+              <div class="km-value">8.4<span class="km-unit">시간</span></div>
+              <div class="km-change neg">▼ 전년 동기 대비 -0.8h</div>
+            </div>
+          </div>
+          <!-- 범례 -->
+          <div class="legend-row">
+            <div class="legend-item"><div class="legend-line" style="background:#7b9ef7"></div>2024년</div>
+            <div class="legend-item"><div class="legend-line" style="background:#f4a76a; border-top: 2px dashed #f4a76a; height:0"></div>2025년</div>
+          </div>
+          <svg viewBox="0 0 380 160">
+            <line x1="45" y1="10" x2="45" y2="130" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="130" x2="370" y2="130" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="50" x2="370" y2="50" class="grid-line-dash"/>
+            <line x1="45" y1="90" x2="370" y2="90" class="grid-line-dash"/>
+            <text x="40" y="133" class="axis-label" text-anchor="end">0h</text>
+            <text x="40" y="93" class="axis-label" text-anchor="end">10h</text>
+            <text x="40" y="53" class="axis-label" text-anchor="end">20h</text>
+            <!-- 2024 라인 (파랑 실선) -->
+            <polyline points="60,85 90,80 120,88 150,75 180,70 210,78 240,65 270,72 300,60 330,68 360,62"
+              fill="none" stroke="#7b9ef7" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="60" cy="85" r="3" fill="#7b9ef7"/>
+            <circle cx="90" cy="80" r="3" fill="#7b9ef7"/>
+            <circle cx="120" cy="88" r="3" fill="#7b9ef7"/>
+            <circle cx="150" cy="75" r="3" fill="#7b9ef7"/>
+            <circle cx="180" cy="70" r="3" fill="#7b9ef7"/>
+            <circle cx="210" cy="78" r="3" fill="#7b9ef7"/>
+            <circle cx="240" cy="65" r="3" fill="#7b9ef7"/>
+            <circle cx="270" cy="72" r="3" fill="#7b9ef7"/>
+            <circle cx="300" cy="60" r="3" fill="#7b9ef7"/>
+            <circle cx="330" cy="68" r="3" fill="#7b9ef7"/>
+            <circle cx="360" cy="62" r="3" fill="#7b9ef7"/>
+            <!-- 2025 라인 (주황 점선) -->
+            <polyline points="60,78 90,72 120,80 150,68 180,63 210,70 240,58 270,65 300,54 330,61 360,56"
+              fill="none" stroke="#f4a76a" stroke-width="2.5" stroke-dasharray="6,3" stroke-linejoin="round"/>
+            <circle cx="60" cy="78" r="3" fill="#f4a76a"/>
+            <circle cx="90" cy="72" r="3" fill="#f4a76a"/>
+            <circle cx="120" cy="80" r="3" fill="#f4a76a"/>
+            <circle cx="150" cy="68" r="3" fill="#f4a76a"/>
+            <circle cx="180" cy="63" r="3" fill="#f4a76a"/>
+            <circle cx="210" cy="70" r="3" fill="#f4a76a"/>
+            <circle cx="240" cy="58" r="3" fill="#f4a76a"/>
+            <circle cx="270" cy="65" r="3" fill="#f4a76a"/>
+            <circle cx="300" cy="54" r="3" fill="#f4a76a"/>
+            <circle cx="330" cy="61" r="3" fill="#f4a76a"/>
+            <circle cx="360" cy="56" r="3" fill="#f4a76a"/>
+            <!-- X축 월 라벨 -->
+            <text x="60" y="145" class="axis-label" text-anchor="middle">1월</text>
+            <text x="90" y="145" class="axis-label" text-anchor="middle">2월</text>
+            <text x="120" y="145" class="axis-label" text-anchor="middle">3월</text>
+            <text x="150" y="145" class="axis-label" text-anchor="middle">4월</text>
+            <text x="180" y="145" class="axis-label" text-anchor="middle">5월</text>
+            <text x="210" y="145" class="axis-label" text-anchor="middle">6월</text>
+            <text x="240" y="145" class="axis-label" text-anchor="middle">7월</text>
+            <text x="270" y="145" class="axis-label" text-anchor="middle">8월</text>
+            <text x="300" y="145" class="axis-label" text-anchor="middle">9월</text>
+            <text x="330" y="145" class="axis-label" text-anchor="middle">10월</text>
+            <text x="360" y="145" class="axis-label" text-anchor="middle">11월</text>
+          </svg>
+        </div>
+
+        <!-- 구분선 -->
+        <div style="width:1px; background:#f0f0f0; margin: 0 4px;"></div>
+
+        <!-- 차트 10: 지연건수 -->
+        <div class="chart-col">
+          <div class="chart-subtitle">VoC 처리 지연건수</div>
+          <!-- KPI 미니 카드 -->
+          <div class="kpi-mini-row">
+            <div class="kpi-mini">
+              <div class="km-label">Last Month</div>
+              <div class="km-value">89<span class="km-unit">건</span></div>
+              <div class="km-change pos">▲ 전월 대비 +7건</div>
+            </div>
+            <div class="kpi-mini">
+              <div class="km-label">Change (YoY)</div>
+              <div class="km-value">+19.2<span class="km-unit">%</span></div>
+              <div class="km-change pos">▲ 전년 동월 대비</div>
+            </div>
+          </div>
+          <!-- 범례 -->
+          <div class="legend-row">
+            <div class="legend-item"><div class="legend-line" style="background:#555"></div>전체</div>
+            <div class="legend-item"><div class="legend-line" style="background:#e07b7b"></div>장기 지연</div>
+            <div class="legend-item"><div class="legend-line" style="background:#f4a76a"></div>단기 지연</div>
+          </div>
+          <svg viewBox="0 0 380 160">
+            <line x1="45" y1="10" x2="45" y2="130" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="130" x2="370" y2="130" stroke="#ddd" stroke-width="1"/>
+            <line x1="45" y1="50" x2="370" y2="50" class="grid-line-dash"/>
+            <line x1="45" y1="90" x2="370" y2="90" class="grid-line-dash"/>
+            <text x="40" y="133" class="axis-label" text-anchor="end">0</text>
+            <text x="40" y="93" class="axis-label" text-anchor="end">50</text>
+            <text x="40" y="53" class="axis-label" text-anchor="end">100</text>
+            <!-- 전체 라인 (진회색) -->
+            <polyline points="60,72 90,68 120,75 150,62 180,58 210,65 240,55 270,60 300,50 330,56 360,52"
+              fill="none" stroke="#555" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="60" cy="72" r="3" fill="#555"/>
+            <circle cx="90" cy="68" r="3" fill="#555"/>
+            <circle cx="120" cy="75" r="3" fill="#555"/>
+            <circle cx="150" cy="62" r="3" fill="#555"/>
+            <circle cx="180" cy="58" r="3" fill="#555"/>
+            <circle cx="210" cy="65" r="3" fill="#555"/>
+            <circle cx="240" cy="55" r="3" fill="#555"/>
+            <circle cx="270" cy="60" r="3" fill="#555"/>
+            <circle cx="300" cy="50" r="3" fill="#555"/>
+            <circle cx="330" cy="56" r="3" fill="#555"/>
+            <circle cx="360" cy="52" r="3" fill="#555"/>
+            <!-- 장기 지연 라인 (빨강) -->
+            <polyline points="60,100 90,95 120,102 150,88 180,85 210,92 240,80 270,86 300,76 330,82 360,78"
+              fill="none" stroke="#e07b7b" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="60" cy="100" r="3" fill="#e07b7b"/>
+            <circle cx="90" cy="95" r="3" fill="#e07b7b"/>
+            <circle cx="120" cy="102" r="3" fill="#e07b7b"/>
+            <circle cx="150" cy="88" r="3" fill="#e07b7b"/>
+            <circle cx="180" cy="85" r="3" fill="#e07b7b"/>
+            <circle cx="210" cy="92" r="3" fill="#e07b7b"/>
+            <circle cx="240" cy="80" r="3" fill="#e07b7b"/>
+            <circle cx="270" cy="86" r="3" fill="#e07b7b"/>
+            <circle cx="300" cy="76" r="3" fill="#e07b7b"/>
+            <circle cx="330" cy="82" r="3" fill="#e07b7b"/>
+            <circle cx="360" cy="78" r="3" fill="#e07b7b"/>
+            <!-- 단기 지연 라인 (주황) -->
+            <polyline points="60,112 90,108 120,114 150,102 180,99 210,106 240,96 270,101 300,92 330,97 360,94"
+              fill="none" stroke="#f4a76a" stroke-width="2" stroke-dasharray="5,3" stroke-linejoin="round"/>
+            <circle cx="60" cy="112" r="3" fill="#f4a76a"/>
+            <circle cx="90" cy="108" r="3" fill="#f4a76a"/>
+            <circle cx="120" cy="114" r="3" fill="#f4a76a"/>
+            <circle cx="150" cy="102" r="3" fill="#f4a76a"/>
+            <circle cx="180" cy="99" r="3" fill="#f4a76a"/>
+            <circle cx="210" cy="106" r="3" fill="#f4a76a"/>
+            <circle cx="240" cy="96" r="3" fill="#f4a76a"/>
+            <circle cx="270" cy="101" r="3" fill="#f4a76a"/>
+            <circle cx="300" cy="92" r="3" fill="#f4a76a"/>
+            <circle cx="330" cy="97" r="3" fill="#f4a76a"/>
+            <circle cx="360" cy="94" r="3" fill="#f4a76a"/>
+            <!-- X축 월 라벨 -->
+            <text x="60" y="145" class="axis-label" text-anchor="middle">1월</text>
+            <text x="90" y="145" class="axis-label" text-anchor="middle">2월</text>
+            <text x="120" y="145" class="axis-label" text-anchor="middle">3월</text>
+            <text x="150" y="145" class="axis-label" text-anchor="middle">4월</text>
+            <text x="180" y="145" class="axis-label" text-anchor="middle">5월</text>
+            <text x="210" y="145" class="axis-label" text-anchor="middle">6월</text>
+            <text x="240" y="145" class="axis-label" text-anchor="middle">7월</text>
+            <text x="270" y="145" class="axis-label" text-anchor="middle">8월</text>
+            <text x="300" y="145" class="axis-label" text-anchor="middle">9월</text>
+            <text x="330" y="145" class="axis-label" text-anchor="middle">10월</text>
+            <text x="360" y="145" class="axis-label" text-anchor="middle">11월</text>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 안내 문구 -->
+  <div style="text-align:center; font-size:11px; color:#bbb; padding-bottom:8px;">
+    ※ 와이어프레임 — 모든 수치는 예시이며, 실제 데이터 수신 후 반영됩니다.
+  </div>
+
+</div>
+</body>
+</html>

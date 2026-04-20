@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[개발 요청] 사업건전성 대시보드 효율/수익 지표 산출 로직 및 화면 개발</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 13px; color: #1A1A1A;
+    background: #F7F8FA;
+    padding: 40px 20px;
+    line-height: 1.7;
+  }
+  .doc-wrap {
+    max-width: 860px; margin: 0 auto;
+    background: #fff;
+    border: 1px solid #E0E4EA;
+    border-radius: 8px;
+    padding: 48px 56px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .doc-header {
+    border-bottom: 2px solid #1E3079;
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+  .doc-title {
+    font-size: 20px; font-weight: 700; color: #1E3079;
+    margin-bottom: 14px;
+  }
+  .doc-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .doc-meta-item { font-size: 12px; color: #555; }
+  .doc-meta-item strong { color: #1A1A1A; }
+
+  .section { margin-bottom: 36px; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: #1E3079;
+    background: #EEF2FB;
+    padding: 7px 14px;
+    border-left: 4px solid #1E3079;
+    margin-bottom: 14px;
+    border-radius: 0 4px 4px 0;
+  }
+  .sub-title {
+    font-size: 13px; font-weight: 700; color: #333;
+    margin: 18px 0 8px;
+    padding-left: 8px;
+    border-left: 3px solid #89B2F7;
+  }
+
+  p { margin-bottom: 10px; }
+  .note {
+    background: #FFFBEA; border: 1px solid #F0D060;
+    border-radius: 4px; padding: 10px 14px;
+    font-size: 12px; color: #7A6000;
+    margin: 10px 0;
+  }
+  .note strong { color: #5A4500; }
+  .tbd {
+    background: #FFF0F0; border: 1px solid #F0A0A0;
+    border-radius: 4px; padding: 10px 14px;
+    font-size: 12px; color: #900;
+    margin: 10px 0;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    margin-bottom: 14px; font-size: 12px;
+  }
+  th {
+    background: #F0F4FB; color: #1E3079;
+    font-weight: 700; text-align: center;
+    padding: 8px 12px;
+    border: 1px solid #D0D8E8;
+  }
+  td {
+    padding: 7px 12px;
+    border: 1px solid #E2E6EE;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #F8FAFD; }
+  td code {
+    background: #EEF2FB; color: #1E3079;
+    padding: 1px 5px; border-radius: 3px;
+    font-size: 11px; font-family: 'Courier New', monospace;
+  }
+
+  pre {
+    background: #F4F6FA; border: 1px solid #DDE2EC;
+    border-radius: 4px; padding: 14px 16px;
+    font-size: 12px; font-family: 'Courier New', monospace;
+    color: #1A1A1A; line-height: 1.8;
+    margin: 8px 0 14px;
+    overflow-x: auto;
+  }
+
+  .flow-box {
+    background: #F0F4FB; border: 1px solid #C8D4EC;
+    border-radius: 6px; padding: 20px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; line-height: 2;
+    color: #1A1A1A;
+  }
+  .flow-box .flow-db     { color: #1E3079; font-weight: 700; }
+  .flow-box .flow-logic  { color: #27AE60; font-weight: 700; }
+  .flow-box .flow-screen { color: #E67E22; font-weight: 700; }
+  .flow-box .flow-arrow  { color: #999; }
+  .flow-box .flow-comment { color: #888; font-style: italic; }
+
+  .doc-footer {
+    margin-top: 40px; padding-top: 16px;
+    border-top: 1px solid #E0E4EA;
+    font-size: 11px; color: #9CA3AF;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="doc-wrap">
+
+  <!-- 문서 헤더 -->
+  <div class="doc-header">
+    <div class="doc-title">[개발 요청] 사업건전성 대시보드 효율/수익 지표 산출 로직 및 화면 개발</div>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>요청 일자</strong>&nbsp;&nbsp;2026-04-20</div>
+      <div class="doc-meta-item"><strong>요청 부서</strong>&nbsp;&nbsp;솔루션사업부 기획팀</div>
+      <div class="doc-meta-item"><strong>요청 대상</strong>&nbsp;&nbsp;SDSC</div>
+      <div class="doc-meta-item"><strong>문서 버전</strong>&nbsp;&nbsp;v0.3</div>
+    </div>
+  </div>
+
+  <!-- 1. 요청 배경 -->
+  <div class="section">
+    <div class="section-title">1. 요청 배경</div>
+    <p>솔루션사업부는 12개 상품의 사업 건전성을 체계적으로 관리하기 위해 <strong>사업건전성 대시보드</strong>를 구축하고 있습니다. 그 중 <strong>효율/수익 영역</strong>은 고객 1인당 수익성, 고객 획득 비용 효율, 매출 및 수익성 추이를 한눈에 파악하기 위한 핵심 영역입니다.</p>
+    <p>원천 데이터(테이블 <code>orderlist</code>의 열 <code>vf219</code>, <code>vf599</code> 등)는 당사 DB에 이미 수신 중이며, 해당 데이터를 기반으로 <strong>지표 산출 로직 개발</strong> 및 <strong>대시보드 화면 개발</strong>을 요청합니다.</p>
+  </div>
+
+  <!-- 2. 요청 사항 요약 -->
+  <div class="section">
+    <div class="section-title">2. 요청 사항 요약</div>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>구분</th><th>내용</th><th>우선순위</th><th>납기 (목표)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>지표 산출 로직 개발</td><td>LTV · CAC · LTV:CAC Ratio · CAC Payback · ARPA 등 지표별 산출 기준에 따른 계산 로직 구현</td><td style="text-align:center">1차</td><td style="text-align:center">미정</td></tr>
+        <tr><td style="text-align:center">2</td><td>화면 개발</td><td>효율/수익 페이지 — 6 Row × 12 카드 구성의 대시보드 화면 개발</td><td style="text-align:center">1차</td><td style="text-align:center">미정</td></tr>
+      </tbody>
+    </table>
+    <div class="note">※ 납기 일정은 협의 후 확정 예정입니다.</div>
+    <div class="note">
+      <strong>선행 확인 필요 항목</strong> — 아래 데이터 출처가 확정되어야 해당 지표 개발 착수가 가능합니다.<br>
+      · Row 1·3·4·5: ARR · ACV · MRR · FTE 인건비 · EBITDA 관련 테이블/필드명<br>
+      · Row 6: Revenue vs. Plan · Operating Profit vs. Plan의 <strong>Plan 데이터 출처</strong> (예산 시스템 또는 별도 입력 테이블) — SDSC 사전 확인 필수
+    </div>
+  </div>
+
+  <!-- 3. 원천 데이터 현황 -->
+  <div class="section">
+    <div class="section-title">3. 원천 데이터 현황</div>
+    <p>아래 데이터는 당사 DB에 이미 수신 중이며, 별도 인터페이스 요청 없이 사용 가능합니다.</p>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>테이블</th><th>열(Column)</th><th>내용</th><th>조회 조건</th><th>히스토리 범위</th><th>활용 지표</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align:center">1</td>
+          <td><code>orderlist</code></td>
+          <td><code>vf219</code></td>
+          <td>매출총계 (상품별 연도별)</td>
+          <td>상품 코드 · 연도 기준 컬럼 — <strong>SDSC 확인 필요</strong></td>
+          <td>2022년 ~ 현재 (Row 1·2 X축 2022 시작)</td>
+          <td>LTV · ARPA · 이탈률</td>
+        </tr>
+        <tr>
+          <td style="text-align:center">2</td>
+          <td><code>orderlist</code></td>
+          <td><code>vf599</code></td>
+          <td>영업/마케팅 비용 (상품별 연도별)</td>
+          <td>상품 코드 · 연도 기준 컬럼 — <strong>SDSC 확인 필요</strong></td>
+          <td>2022년 ~ 현재</td>
+          <td>CAC</td>
+        </tr>
+        <tr>
+          <td style="text-align:center">3</td>
+          <td>미확인</td>
+          <td>—</td>
+          <td>Revenue · Operating Profit · Plan · FTE · ARR 등</td>
+          <td>SDSC 확인 필요</td>
+          <td>Row 5 기준: 2023.10 ~ 현재</td>
+          <td>Row 1·3·4·5·6 지표</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      ※ <code>orderlist.vf219</code>는 RC/NRC 데이터 분리가 어려우므로, 실무 적용 시 전체 매출을 Recurring Revenue로 간주하여 사용합니다.
+    </div>
+  </div>
+
+  <!-- 4. 마스터 데이터 요청 -->
+  <div class="section">
+    <div class="section-title">4. 마스터 데이터 요청 (화면 필터용)</div>
+    <p>화면 상단 <strong>상품 드롭다운 필터</strong> 구현을 위해 아래 마스터 데이터가 필요합니다.</p>
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th>항목</th><th>내용</th><th>샘플값</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="text-align:center">1</td><td>상품 목록</td><td>필터 드롭다운에 표시될 상품명 목록 (코드 + 표시명)</td><td>ZTM · Nexprime SCM · Knox Portal · EMS 등 13개</td></tr>
+        <tr><td style="text-align:center">2</td><td>상품 그룹핑</td><td>상품 개별 / 전체(All) 선택 구분</td><td>Knox (All) = Knox Portal + Knox Meeting + Knox EFSS/Drive</td></tr>
+        <tr><td style="text-align:center">3</td><td>EMS 예외 처리</td><td>EMS / EMS(All) 선택 시 LTV:CAC 관련 카드 N/A 표시 처리용 플래그</td><td>is_ltv_applicable: Y/N</td></tr>
+      </tbody>
+    </table>
+    <div class="note">※ 상품 코드 체계 및 마스터 테이블명은 SDSC 확인 후 공유 바랍니다.</div>
+  </div>
+
+  <!-- 5. 상품 분류 및 지표 산출 가능 여부 -->
+  <div class="section">
+    <div class="section-title">5. 상품 분류 및 지표 산출 가능 여부</div>
+    <table>
+      <thead>
+        <tr><th>상품</th><th>License Type</th><th>Price Type</th><th>RC/NRC</th><th style="text-align:center">LTV</th><th style="text-align:center">CAC</th><th style="text-align:center">LTV:CAC</th><th style="text-align:center">CAC Payback</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ZTM</td><td>Term</td><td>Fixed</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Nexprime SCM</td><td>Term</td><td>Fixed</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Nexprime SCM Mobile</td><td>Term</td><td>Fixed</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Nexprime SCM (All)</td><td>Term</td><td>Fixed</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Nexprime HCM</td><td>Term</td><td>Fixed</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Knox Portal</td><td>Term</td><td>Usage</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Knox Meeting</td><td>Term</td><td>Usage</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Knox EFSS/Drive</td><td>Term</td><td>Usage</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Knox (All)</td><td>Term</td><td>Usage</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>EMM Cloud</td><td>Term</td><td>Usage</td><td>RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>Brity Automation</td><td>Term+Perpetual</td><td>Fixed+One-time</td><td>RC+Non-RC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+        <tr><td>EMS</td><td>Term+Perpetual</td><td>Fixed+One-time</td><td>RC+Non-RC</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+        <tr><td>EMS (All)</td><td>Term+Perpetual</td><td>Fixed+One-time</td><td>RC+Non-RC</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      ※ <strong>EMS / EMS (All)</strong>: Recurring 비중 약 9% (라이선스+운영 149억 / 전체 1,572억), 데이터 분리 불가로 LTV · LTV:CAC · CAC Payback 산출 제외. CAC만 산출.
+    </div>
+  </div>
+
+  <!-- 6. 지표별 산출 기준 -->
+  <div class="section">
+    <div class="section-title">6. 지표별 산출 기준</div>
+
+    <div class="sub-title">6-1. ARPA (Average Revenue Per Account)</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>sum(orderlist.vf219) ÷ 고객 수</code></td></tr>
+        <tr><td>고객 수 기준</td><td>해당 연도 orderlist.vf219 ≠ 0인 고객 수</td></tr>
+        <tr><td>Revenue 범위</td><td>orderlist.vf219 전체 (RC/NRC 분리 불가로 전체를 Recurring으로 간주)</td></tr>
+        <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-2. 이탈률 (Churn Rate)</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>(1 - (N-1년 sum(orderlist.vf219) ÷ N-2년 sum(orderlist.vf219))) × 100</code></td></tr>
+        <tr><td>예외</td><td>N-1년 ≥ N-2년이면 이탈률 = 0</td></tr>
+        <tr><td>이탈률 = 0일 때</td><td>LTV · LTV:CAC · CAC Payback 모두 빈칸 표시</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-3. LTV (Customer Lifetime Value)</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>ARPA ÷ 이탈률</code></td></tr>
+        <tr><td>적용 상품</td><td>EMS / EMS(All) 제외 전 상품</td></tr>
+        <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
+        <tr><td>단위</td><td>억원</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-4. CAC (Customer Acquisition Cost)</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>N-2년 sum(orderlist.vf599) ÷ N-1년 신규 고객 수</code></td></tr>
+        <tr><td>신규 고객 정의</td><td>N-2년 orderlist.vf219 = 0 <strong>AND</strong> N-1년 orderlist.vf219 ≠ 0</td></tr>
+        <tr><td>적용 상품</td><td>전체 (EMS 포함)</td></tr>
+        <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
+        <tr><td>단위</td><td>억원</td></tr>
+        <tr><td>예외</td><td>신규 고객 수 = 0이면 빈칸</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-5. LTV:CAC Ratio</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>LTV ÷ CAC</code></td></tr>
+        <tr><td>적용 상품</td><td>EMS / EMS(All) 제외 전 상품</td></tr>
+        <tr><td>단위</td><td>배수 (예: 1.6배)</td></tr>
+        <tr><td>참고 기준</td><td>LTV : CAC = 3 : 1이 적정 수준</td></tr>
+        <tr><td>예외</td><td>LTV 또는 CAC 빈칸이면 빈칸</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-6. CAC Payback Period</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>(CAC ÷ ARPA) × 12</code></td></tr>
+        <tr><td>적용 상품</td><td>EMS / EMS(All) 제외 전 상품</td></tr>
+        <tr><td>단위</td><td>개월</td></tr>
+        <tr><td>참고 기준</td><td>B2B SaaS 적정 수준: 12개월 이하</td></tr>
+        <tr><td>예외</td><td>ARPA = 0 또는 CAC 빈칸이면 빈칸</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-7. Row 1 — Sales Efficiency (분기 기준)</div>
+    <table>
+      <thead><tr><th style="width:22%">항목</th><th>Gross Sales Efficiency</th><th>Net Sales Efficiency</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>당 분기 총 신규 ARR ÷ 전 분기 영업/마케팅 비용</code></td><td><code>당 분기 Net New ARR ÷ 전 분기 영업/마케팅 비용</code></td></tr>
+        <tr><td>분자 정의</td><td>총 신규 ARR = New ARR + Expansion ARR<br>(신규·기존 고객 합산, 분기 ARR = 분기 MRR 합 × 4)</td><td>Net New ARR = New ARR + Expansion ARR − Contraction ARR − Churn ARR<br>= 당기 ARR − 전기 ARR</td></tr>
+        <tr><td>분모 정의</td><td colspan="2">전 분기 영업/마케팅 비용 (판매비, <code>orderlist.vf599</code> 기준)</td></tr>
+        <tr><td>집계 주기</td><td colspan="2">분기별 (22.4Q ~ 25.3Q)</td></tr>
+        <tr><td>단위</td><td colspan="2">배수 (소수점 2자리)</td></tr>
+        <tr><td>적정 수준</td><td>0.8 ~ 1.2 (B2B SaaS 기준)</td><td>0.6 ~ 0.8 (성장단계 기준)</td></tr>
+        <tr><td>데이터 출처</td><td colspan="2">ARR 데이터 — SDSC 확인 필요 / 영업비용 — <code>orderlist.vf599</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-8. Row 3 — ARPA 추이 (분기별)</div>
+    <table>
+      <thead><tr><th style="width:22%">항목</th><th>ARPA by ACV</th><th>ARPA by MRR</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>ACV 총합 ÷ 총 고객 수</code></td><td><code>MRR ÷ 총 유료 고객사 수</code></td></tr>
+        <tr><td>세부 정의</td><td>ACV = [TCV − 일회성 매출] ÷ 총 계약기간(연수)</td><td>MRR = 반복 정기 라이선스 매출 합계</td></tr>
+        <tr><td>집계 주기</td><td colspan="2">분기별 (22.4Q ~ 25.3Q)</td></tr>
+        <tr><td>단위</td><td>억원</td><td>천만원</td></tr>
+        <tr><td>데이터 출처</td><td>TCV · 일회성 매출 · 계약기간 — SDSC 확인 필요</td><td>MRR · 유료 고객사 수 — SDSC 확인 필요</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-9. Row 4 — 효율 지표</div>
+    <table>
+      <thead><tr><th style="width:22%">항목</th><th>Revenue on FTE</th><th>Rule of 40</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>Revenue ÷ FTE 수</code></td><td><code>% ARR Growth YoY + EBITDA 마진</code></td></tr>
+        <tr><td>세부 정의</td>
+          <td>FTE 수 = 상품별 인건비 합 ÷ 회사 평균 인건비<br>
+              포함 비용: 직접인건비 + 인건비성 복리후생비 + 간미총계 + 판매자체(전마) + 판매배부(전마배부·상품기획·사업관리)<br>
+              포함 인력: 상품기획/사업관리, 개발, 딜리버리, 운영, 영업(전마)</td>
+          <td>% ARR Growth = (당기 ARR − 전기 ARR) ÷ 전기 ARR × 100<br>
+              EBITDA 마진 = EBITDA ÷ 매출 × 100</td>
+        </tr>
+        <tr><td>집계 주기</td><td>반기</td><td>분기별 (22.4Q ~ 25.3Q)</td></tr>
+        <tr><td>단위</td><td>억원/명</td><td>% (합산 수치)</td></tr>
+        <tr><td>적정 수준</td><td>—</td><td>40% 이상</td></tr>
+        <tr><td>데이터 출처</td><td>인건비 데이터 — SDSC 확인 필요</td><td>ARR · EBITDA — SDSC 확인 필요</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-10. Row 5 — 수익성 추이 (월별)</div>
+    <table>
+      <thead><tr><th style="width:22%">항목</th><th>Revenue &amp; Operating Profit</th><th>% Gross Margin &amp; % Operating Margin</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td>Revenue · Operating Profit 절대값 표시<br>(기존 BI 동일 로직 준용 — 집계 테이블·필드명 SDSC 확인 필요)</td><td>
+          % Gross Margin = <code>(매출 − 직접원가 − 간접원가) ÷ 매출 × 100</code><br>
+          % Operating Margin = <code>(매출 − 직접원가 − 간접원가 − 판매비 − 일반비) ÷ 매출 × 100</code>
+        </td></tr>
+        <tr><td>집계 주기</td><td colspan="2">월별 (2023.10 ~ 2025.10)</td></tr>
+        <tr><td>단위</td><td>억원</td><td>%</td></tr>
+        <tr><td>데이터 출처</td><td colspan="2">매출 · 직접원가 · 간접원가 · 판매비 · 일반비 — SDSC 확인 필요</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">6-11. Row 6 — 목표 대비 실적</div>
+    <table>
+      <thead><tr><th style="width:22%">항목</th><th>Revenue vs. Plan</th><th>Operating Profit vs. Plan</th></tr></thead>
+      <tbody>
+        <tr><td>산식</td><td><code>실적 Revenue ÷ Plan Revenue × 100</code> (달성률)</td><td><code>실적 Operating Profit ÷ Plan Operating Profit × 100</code> (달성률)</td></tr>
+        <tr><td>차트 구성</td><td colspan="2">Plan (바) · 실적 (바) · 달성률 (라인), 트리플 바 + 달성률 라인</td></tr>
+        <tr><td>집계 주기</td><td colspan="2">월별 (해당 연도 1월 ~ 7월)</td></tr>
+        <tr><td>단위</td><td colspan="2">억원 (바) / % (달성률 라인)</td></tr>
+        <tr><td>데이터 출처</td><td colspan="2"><strong>Plan 데이터 출처 — SDSC 확인 필요</strong> (예산 시스템 또는 별도 입력 테이블)</td></tr>
+      </tbody>
+    </table>
+    <div class="note">※ Row 6 Plan 데이터는 사내 예산 시스템 또는 별도 입력 테이블에서 조회 가능한지 SDSC 확인이 필요합니다.</div>
+  </div>
+
+  <!-- 7. 예외 처리 기준 -->
+  <div class="section">
+    <div class="section-title">7. 예외 처리 기준 (공통)</div>
+    <table>
+      <thead>
+        <tr><th>조건</th><th>처리 방식</th><th>영향 지표</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>이탈률 = 0</td><td>빈칸 표시</td><td>LTV · LTV:CAC · CAC Payback</td></tr>
+        <tr><td>신규 고객 수 = 0</td><td>빈칸 표시</td><td>CAC · LTV:CAC · CAC Payback</td></tr>
+        <tr><td>ARPA = 0</td><td>빈칸 표시</td><td>CAC Payback</td></tr>
+        <tr><td>EMS / EMS(All) 선택 시</td><td>LTV · LTV:CAC · CAC Payback 카드 N/A 표시</td><td>Row 2 전체</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8. 화면 개발 스펙 -->
+  <div class="section">
+    <div class="section-title">8. 화면 개발 스펙</div>
+
+    <div class="sub-title">8-1. 전체 레이아웃</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>구성</td><td>6 Row × 2 카드 (총 12 카드)</td></tr>
+        <tr><td>상단 필터</td><td>상품 드롭다운 (전체 / 상품별 선택) — Section 4 마스터 데이터 기반</td></tr>
+        <tr><td>표시 주기</td><td>Yearly 기본 (Row 3·4·5·6은 분기/월별)</td></tr>
+        <tr><td>페이지 배경</td><td>#F5F5F5</td></tr>
+        <tr><td>카드 스타일</td><td>border-radius: 8px · box-shadow: 0 2px 8px rgba(0,0,0,0.08)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">8-2. Row별 카드 스펙</div>
+    <table>
+      <thead>
+        <tr><th>Row</th><th>카드 (좌)</th><th>카드 (우)</th><th>차트 타입</th><th>X축</th><th>단위</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Row 1</td><td>Gross Sales Efficiency</td><td>Net Sales Efficiency</td><td>단색 바 차트</td><td>2022 / 2023 / 2024</td><td>배수</td></tr>
+        <tr><td>Row 2</td><td>CAC / LTV / LTV:CAC Ratio</td><td>CAC Payback Period</td><td>콤비네이션(좌) · 라인(우)</td><td>2022 / 2023 / 2024</td><td>억원 · 배수 / 개월</td></tr>
+        <tr><td>Row 3</td><td>ARPA by ACV</td><td>ARPA by MRR</td><td>다중 라인 차트</td><td>22.4Q ~ 25.3Q (12분기)</td><td>억원 / 천만원</td></tr>
+        <tr><td>Row 4</td><td>Revenue on FTE</td><td>Rule of 40</td><td>라인(좌) · 다중 라인(우)</td><td>반기 / 22.4Q ~ 25.3Q</td><td>억원 / %</td></tr>
+        <tr><td>Row 5</td><td>Revenue &amp; Operating Profit</td><td>% Gross Margin &amp; % Operating Margin</td><td>콤비네이션 · 다중 라인</td><td>월별 (23.10 ~ 25.10)</td><td>억원 / %</td></tr>
+        <tr><td>Row 6</td><td>Revenue vs. Plan</td><td>Operating Profit vs. Plan</td><td>트리플 바 + 달성률 라인</td><td>월별 (1월 ~ 7월)</td><td>억원 / %</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sub-title">8-3. 색상 시스템</div>
+    <table>
+      <thead><tr><th>요소</th><th>색상 코드</th></tr></thead>
+      <tbody>
+        <tr><td>주요 바 차트 (라이트 블루)</td><td><code>#90CAF9</code></td></tr>
+        <tr><td>미디엄 블루</td><td><code>#42A5F5</code></td></tr>
+        <tr><td>다크 블루</td><td><code>#1E88E5</code></td></tr>
+        <tr><td>오렌지 (라인 / YoY)</td><td><code>#FF9800</code></td></tr>
+        <tr><td>퍼플</td><td><code>#7E57C2</code></td></tr>
+        <tr><td>그레이</td><td><code>#9E9E9E</code></td></tr>
+        <tr><td>사이드바 배경</td><td><code>#1E2A3A ~ #2C3E50</code> (그라데이션)</td></tr>
+        <tr><td>현재 페이지 하이라이트</td><td><code>#17B9A6</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 9. 데이터 흐름 -->
+  <div class="section">
+    <div class="section-title">9. 데이터 흐름 구조</div>
+    <div class="flow-box">
+      <span class="flow-db">orderlist.vf219 (매출총계)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
+      <span class="flow-db">orderlist.vf599 (영업/마케팅 비용)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ (지표 산출 로직)</span><br>
+      <span class="flow-logic">ARPA · 이탈률 · LTV · CAC · LTV:CAC · CAC Payback</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─▶ Row 2: CAC / LTV / LTV:CAC Ratio 카드</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─▶ Row 2: CAC Payback Period 카드</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ (기존 BI 로직 연동)</span><br>
+      <span class="flow-logic">Sales Efficiency · ARPA by ACV/MRR · Revenue on FTE · Rule of 40 · Revenue &amp; Operating Profit · Plan 대비</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
+      <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼</span><br>
+      <span class="flow-screen">효율/수익 대시보드 화면 (Row 1 ~ Row 6)</span>
+    </div>
+  </div>
+
+  <!-- 10. 문의처 -->
+  <div class="section">
+    <div class="section-title">10. 문의처</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>담당자</td><td>미정</td></tr>
+        <tr><td>부서</td><td>솔루션사업부 기획팀</td></tr>
+        <tr><td>연락처</td><td>미정</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    솔루션사업부 기획팀 · 2026-04-20 · v0.3
+  </div>
+
+</div>
+</body>
+</html>
