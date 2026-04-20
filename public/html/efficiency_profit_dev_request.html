@@ -138,7 +138,7 @@
   <div class="section">
     <div class="section-title">1. 요청 배경</div>
     <p>솔루션사업부는 12개 상품의 사업 건전성을 체계적으로 관리하기 위해 <strong>사업건전성 대시보드</strong>를 구축하고 있습니다. 그 중 <strong>효율/수익 영역</strong>은 고객 1인당 수익성, 고객 획득 비용 효율, 매출 및 수익성 추이를 한눈에 파악하기 위한 핵심 영역입니다.</p>
-    <p>원천 데이터(테이블 <code>orderlist</code>의 열 <code>vf219</code>, <code>vf599</code> 등)는 당사 DB에 이미 수신 중이며, 해당 데이터를 기반으로 <strong>지표 산출 로직 개발</strong> 및 <strong>대시보드 화면 개발</strong>을 요청합니다.</p>
+    <p>원천 데이터(테이블 <code>l_sap.orderlist</code>의 열 <code>vf219</code>, <code>vf599</code> 등)는 당사 DB에 이미 수신 중이며, 해당 데이터를 기반으로 <strong>지표 산출 로직 개발</strong> 및 <strong>대시보드 화면 개발</strong>을 요청합니다.</p>
   </div>
 
   <!-- 2. 요청 사항 요약 -->
@@ -172,7 +172,7 @@
       <tbody>
         <tr>
           <td style="text-align:center">1</td>
-          <td><code>orderlist</code></td>
+          <td><code>l_sap.orderlist</code></td>
           <td><code>vf219</code></td>
           <td>매출총계 (상품별 연도별)</td>
           <td>상품 코드 · 연도 기준 컬럼 — <strong>SDSC 확인 필요</strong></td>
@@ -181,7 +181,7 @@
         </tr>
         <tr>
           <td style="text-align:center">2</td>
-          <td><code>orderlist</code></td>
+          <td><code>l_sap.orderlist</code></td>
           <td><code>vf599</code></td>
           <td>영업/마케팅 비용 (상품별 연도별)</td>
           <td>상품 코드 · 연도 기준 컬럼 — <strong>SDSC 확인 필요</strong></td>
@@ -200,7 +200,7 @@
       </tbody>
     </table>
     <div class="note">
-      ※ <code>orderlist.vf219</code>는 RC/NRC 데이터 분리가 어려우므로, 실무 적용 시 전체 매출을 Recurring Revenue로 간주하여 사용합니다.
+      ※ <code>l_sap.orderlist.vf219</code>는 RC/NRC 데이터 분리가 어려우므로, 실무 적용 시 전체 매출을 Recurring Revenue로 간주하여 사용합니다.
     </div>
   </div>
 
@@ -257,9 +257,9 @@
     <table>
       <thead><tr><th>항목</th><th>내용</th></tr></thead>
       <tbody>
-        <tr><td>산식</td><td><code>sum(orderlist.vf219) ÷ 고객 수</code></td></tr>
-        <tr><td>고객 수 기준</td><td>해당 연도 orderlist.vf219 ≠ 0인 고객 수</td></tr>
-        <tr><td>Revenue 범위</td><td>orderlist.vf219 전체 (RC/NRC 분리 불가로 전체를 Recurring으로 간주)</td></tr>
+        <tr><td>산식</td><td><code>sum(l_sap.orderlist.vf219) ÷ 고객 수</code></td></tr>
+        <tr><td>고객 수 기준</td><td>해당 연도 l_sap.orderlist.vf219 ≠ 0인 고객 수</td></tr>
+        <tr><td>Revenue 범위</td><td>l_sap.orderlist.vf219 전체 (RC/NRC 분리 불가로 전체를 Recurring으로 간주)</td></tr>
         <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
       </tbody>
     </table>
@@ -268,7 +268,7 @@
     <table>
       <thead><tr><th>항목</th><th>내용</th></tr></thead>
       <tbody>
-        <tr><td>산식</td><td><code>(1 - (N-1년 sum(orderlist.vf219) ÷ N-2년 sum(orderlist.vf219))) × 100</code></td></tr>
+        <tr><td>산식</td><td><code>(1 - (N-1년 sum(l_sap.orderlist.vf219) ÷ N-2년 sum(l_sap.orderlist.vf219))) × 100</code></td></tr>
         <tr><td>예외</td><td>N-1년 ≥ N-2년이면 이탈률 = 0</td></tr>
         <tr><td>이탈률 = 0일 때</td><td>LTV · LTV:CAC · CAC Payback 모두 빈칸 표시</td></tr>
       </tbody>
@@ -289,8 +289,8 @@
     <table>
       <thead><tr><th>항목</th><th>내용</th></tr></thead>
       <tbody>
-        <tr><td>산식</td><td><code>N-2년 sum(orderlist.vf599) ÷ N-1년 신규 고객 수</code></td></tr>
-        <tr><td>신규 고객 정의</td><td>N-2년 orderlist.vf219 = 0 <strong>AND</strong> N-1년 orderlist.vf219 ≠ 0</td></tr>
+        <tr><td>산식</td><td><code>N-2년 sum(l_sap.orderlist.vf599) ÷ N-1년 신규 고객 수</code></td></tr>
+        <tr><td>신규 고객 정의</td><td>N-2년 l_sap.orderlist.vf219 = 0 <strong>AND</strong> N-1년 l_sap.orderlist.vf219 ≠ 0</td></tr>
         <tr><td>적용 상품</td><td>전체 (EMS 포함)</td></tr>
         <tr><td>표시 주기</td><td>Yearly (2023 / 2024 / 2025)</td></tr>
         <tr><td>단위</td><td>억원</td></tr>
@@ -328,11 +328,11 @@
       <tbody>
         <tr><td>산식</td><td><code>당 분기 총 신규 ARR ÷ 전 분기 영업/마케팅 비용</code></td><td><code>당 분기 Net New ARR ÷ 전 분기 영업/마케팅 비용</code></td></tr>
         <tr><td>분자 정의</td><td>총 신규 ARR = New ARR + Expansion ARR<br>(신규·기존 고객 합산, 분기 ARR = 분기 MRR 합 × 4)</td><td>Net New ARR = New ARR + Expansion ARR − Contraction ARR − Churn ARR<br>= 당기 ARR − 전기 ARR</td></tr>
-        <tr><td>분모 정의</td><td colspan="2">전 분기 영업/마케팅 비용 (판매비, <code>orderlist.vf599</code> 기준)</td></tr>
+        <tr><td>분모 정의</td><td colspan="2">전 분기 영업/마케팅 비용 (판매비, <code>l_sap.orderlist.vf599</code> 기준)</td></tr>
         <tr><td>집계 주기</td><td colspan="2">분기별 (22.4Q ~ 25.3Q)</td></tr>
         <tr><td>단위</td><td colspan="2">배수 (소수점 2자리)</td></tr>
         <tr><td>적정 수준</td><td>0.8 ~ 1.2 (B2B SaaS 기준)</td><td>0.6 ~ 0.8 (성장단계 기준)</td></tr>
-        <tr><td>데이터 출처</td><td colspan="2">ARR 데이터 — SDSC 확인 필요 / 영업비용 — <code>orderlist.vf599</code></td></tr>
+        <tr><td>데이터 출처</td><td colspan="2">ARR 데이터 — SDSC 확인 필요 / 영업비용 — <code>l_sap.orderlist.vf599</code></td></tr>
       </tbody>
     </table>
 
@@ -462,8 +462,8 @@
   <div class="section">
     <div class="section-title">9. 데이터 흐름 구조</div>
     <div class="flow-box">
-      <span class="flow-db">orderlist.vf219 (매출총계)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
-      <span class="flow-db">orderlist.vf599 (영업/마케팅 비용)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
+      <span class="flow-db">l_sap.orderlist.vf219 (매출총계)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
+      <span class="flow-db">l_sap.orderlist.vf599 (영업/마케팅 비용)</span>&nbsp;&nbsp;<span class="flow-comment">← 당사 DB 기 수신</span><br>
       <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</span><br>
       <span class="flow-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ (지표 산출 로직)</span><br>
       <span class="flow-logic">ARPA · 이탈률 · LTV · CAC · LTV:CAC · CAC Payback</span><br>

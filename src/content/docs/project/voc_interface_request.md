@@ -204,3 +204,10 @@ title: voc interface request
 |---|--------|----------|---------|
 | 1 | 접수채널 | 채널별 VoC 건수 / 지표 필터링 | CALL / CHAT / E-MAIL / WEB |
 | 2 | 처리구분 | 처리 선별 VoC 건수 / 지표 필터링 | 1선 / 2선 / 3선 |
+
+
+---
+
+## 첨부 파일
+
+- [📥 Excel 다운로드](/files/voc_interface_request.xlsx)

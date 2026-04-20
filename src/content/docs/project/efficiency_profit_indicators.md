@@ -427,3 +427,10 @@ KPI 섹션 (카드 상단)
 | box-shadow | 0 2px 8px rgba(0,0,0,0.08) |
 | 내부 패딩 | 20~24px |
 | KPI 분리선 | 1px solid #F0F0F0 |
+
+
+---
+
+## 첨부 파일
+
+- [📥 Excel 다운로드](/files/efficiency_profit_dev_request.xlsx)

@@ -8,11 +8,36 @@ const docsBase = join(projectRoot, 'src', 'content', 'docs');
 const publicBase = join(projectRoot, 'public', 'html');
 const publicFiles = join(projectRoot, 'public', 'files');
 
+// MD 파일별 첨부 파일 매핑 (파일명 → [{label, path}])
+const mdAttachments = {
+  'voc_interface_request.md': [
+    { label: 'Excel 다운로드', file: 'voc_interface_request.xlsx' },
+  ],
+  'efficiency_profit_indicators.md': [
+    { label: 'Excel 다운로드', file: 'efficiency_profit_dev_request.xlsx' },
+  ],
+};
+
 async function ensureTitle(filePath) {
-  const content = await readFile(filePath, 'utf-8');
-  if (content.startsWith('---')) return;
-  const name = basename(filePath, '.md').replace(/_/g, ' ');
-  await writeFile(filePath, `---\ntitle: ${name}\n---\n\n${content}`);
+  let content = await readFile(filePath, 'utf-8');
+  const name = basename(filePath);
+  const attachments = mdAttachments[name] || [];
+
+  // 첨부 링크 섹션 생성
+  const attachSection = attachments.length > 0
+    ? '\n\n---\n\n## 첨부 파일\n\n' +
+      attachments.map(a => `- [📥 ${a.label}](/files/${a.file})`).join('\n')
+    : '';
+
+  if (content.startsWith('---')) {
+    // 이미 frontmatter 있음 — 첨부 섹션만 끝에 추가 (중복 방지)
+    if (attachSection && !content.includes('## 첨부 파일')) {
+      await writeFile(filePath, content + attachSection);
+    }
+    return;
+  }
+  const title = basename(filePath, '.md').replace(/_/g, ' ');
+  await writeFile(filePath, `---\ntitle: ${title}\n---\n\n${content}${attachSection}`);
 }
 
 async function ensureTitlesInDir(dir) {
