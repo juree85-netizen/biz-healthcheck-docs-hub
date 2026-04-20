@@ -73,6 +73,7 @@ const htmlLabels = {
   'efficiency_profit_dev_request.html': '효율/수익 지표 개발 요청서',
   'voc_dashboard_wireframe.html': 'VoC 대시보드 와이어프레임',
   'voc_dev_request.html': 'VoC 인터페이스 개발 요청서',
+  'market_wireframe.html': '재무 (시장) 와이어프레임',
 };
 
 const xlsxLabels = {

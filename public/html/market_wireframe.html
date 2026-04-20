@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사업건전성 - 재무 (시장) 와이어프레임</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Malgun Gothic', sans-serif; display: flex; height: 100vh; background: #F5F5F5; font-size: 12px; }
+
+  /* ── 사이드바 ── */
+  .sidebar {
+    width: 200px; min-width: 200px;
+    background: #1E3079;
+    color: #B8C6DB; display: flex; flex-direction: column; padding: 0;
+  }
+  .sidebar-logo {
+    padding: 18px 16px 14px;
+    font-size: 13px; font-weight: 700; color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-menu { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .menu-item {
+    padding: 9px 16px; cursor: pointer; font-size: 11.5px;
+    color: #B8C6DB; display: flex; align-items: center; gap: 6px;
+  }
+  .menu-item:hover { background: rgba(255,255,255,0.07); }
+  .menu-item.active {
+    background: #17B8B8; color: #fff; font-weight: 600;
+    border-radius: 0 20px 20px 0; margin-right: 8px;
+  }
+  .menu-item.parent { font-weight: 600; color: #CBD8E8; }
+  .menu-item.sub { padding-left: 28px; font-size: 11px; }
+  .menu-item.sub2 { padding-left: 40px; font-size: 11px; }
+  .menu-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 6px 0; }
+  .menu-arrow { margin-left: auto; font-size: 9px; opacity: 0.6; }
+
+  /* ── 메인 영역 ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── 헤더 ── */
+  .header {
+    background: #fff; border-bottom: 1px solid #E0E0E0;
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .header-title { font-size: 16px; font-weight: 700; color: #1A1A1A; margin-right: 8px; }
+  .header-sub { font-size: 12px; color: #888; }
+  .header-filter {
+    margin-left: 16px;
+    border: 1px solid #ddd; border-radius: 6px;
+    padding: 5px 28px 5px 10px; font-size: 12px; color: #333;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 8px center;
+    appearance: none; cursor: pointer;
+  }
+  .header-spacer { flex: 1; }
+  .status-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: #EBF5FB; border: 1px solid #AED6F1;
+    border-radius: 12px; padding: 4px 10px; font-size: 11px; color: #1A5276;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4A90E2; }
+  .header-date { font-size: 11px; color: #888; }
+  .header-update { font-size: 10px; color: #aaa; }
+
+  /* ── 컨텐츠 ── */
+  .content { flex: 1; overflow-y: auto; padding: 16px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; align-items: start; }
+
+  /* ── 카드 ── */
+  .card {
+    background: #fff; border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    padding: 14px 16px; overflow: hidden;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700; color: #1A1A1A;
+    margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-unit { font-size: 10px; color: #999; font-weight: 400; }
+
+  /* 카드 필터 ctrl-row */
+  .ctrl-row {
+    display: flex; gap: 6px; margin-bottom: 10px;
+  }
+  .ctrl-select {
+    border: 1px solid #ddd; border-radius: 5px;
+    padding: 3px 20px 3px 8px; font-size: 11px; color: #555;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 6px center;
+    appearance: none; cursor: pointer;
+  }
+
+  /* KPI 섹션 */
+  .kpi-row { display: flex; gap: 0; border-bottom: 1px solid #F0F0F0; margin-bottom: 12px; }
+  .kpi-box { flex: 1; padding: 8px 10px; border-right: 1px solid #F0F0F0; text-align: center; }
+  .kpi-box:last-child { border-right: none; }
+  .kpi-label { font-size: 10px; color: #999; margin-bottom: 3px; }
+  .kpi-value { font-size: 20px; font-weight: 700; color: #1E2A3A; line-height: 1.1; }
+  .kpi-value.positive { color: #27AE60; }
+  .kpi-value.negative { color: #E74C3C; }
+  .kpi-change { font-size: 10px; margin-top: 2px; color: #E74C3C; }
+  .kpi-change.neutral { color: #888; }
+  .kpi-change.green { color: #10B981; }
+
+  /* 차트 영역 공통 */
+  .chart-area { width: 100%; position: relative; }
+  svg text { font-family: 'Malgun Gothic', sans-serif; }
+
+  /* 범례 */
+  .legend { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend-line { width: 16px; height: 3px; border-radius: 2px; }
+  .legend-bar { width: 12px; height: 10px; border-radius: 2px; }
+
+  /* 데이터 테이블 */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
+  .data-table th {
+    background: #F9FAFB; border: 1px solid #E5E7EB;
+    padding: 6px 8px; text-align: center; font-weight: 600; color: #555;
+    font-size: 11px;
+  }
+  .data-table td {
+    border: 1px solid #E5E7EB;
+    padding: 6px 8px; text-align: right; color: #333;
+    font-size: 11px;
+  }
+  .data-table td:first-child { text-align: left; font-weight: 600; color: #1E2A3A; }
+  .data-table tr:hover td { background: #F3F4F6; }
+  .data-table .cagr-col { color: #4A90E2; font-weight: 600; }
+  .data-table .highlight { color: #EF4444; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ 사이드바 ══════════════ -->
+<div class="sidebar">
+  <div class="sidebar-logo">&#128202; 사업건전성</div>
+  <div class="sidebar-menu">
+    <div class="menu-item">사업부 대시보드</div>
+    <div class="menu-item">사업건전성 현황</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item parent">사업건전성 영역별 현황 <span class="menu-arrow">&#9662;</span></div>
+    <div class="menu-item sub parent">재무 <span class="menu-arrow">&#9662;</span></div>
+    <div class="menu-item sub2">효율/수익</div>
+    <div class="menu-item sub2 active">시장</div>
+    <div class="menu-item sub">성장</div>
+    <div class="menu-item sub">영업</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item">고객 현황</div>
+    <div class="menu-item">매출/원가 현황</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item parent">지표 정보 <span class="menu-arrow">&#9662;</span></div>
+    <div class="menu-item sub">지표</div>
+    <div class="menu-item sub">지표 테이블</div>
+    <div class="menu-item sub">지표 원천데이터</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item">로그아웃</div>
+  </div>
+</div>
+
+<!-- ══════════════ 메인 ══════════════ -->
+<div class="main">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <span class="header-title">사업건전성</span>
+    <span class="header-sub">재무 &gt; 시장</span>
+    <select class="header-filter">
+      <option>Brity Automation</option>
+      <option>ZTM</option>
+      <option>Knox Portal</option>
+    </select>
+    <div class="header-spacer"></div>
+    <div class="status-badge"><div class="status-dot"></div>사업 건전성: 양호</div>
+    <div class="header-date">기준월: 24년 08월</div>
+    <div class="header-update">업데이트: 매월 10일</div>
+  </div>
+
+  <!-- 컨텐츠 -->
+  <div class="content">
+
+    <!-- ══ Row 1 ══ -->
+    <div class="row">
+
+      <!-- 카드 1-1: Revenue & Market Share (External) -->
+      <div class="card">
+        <div class="card-title">Revenue &amp; Market Share (External) <span class="card-unit">억원 / %</span></div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- KPI 2개 -->
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-label">Revenue (2025)</div>
+            <div class="kpi-value">386억</div>
+            <div class="kpi-change">(-55억)</div>
+            <div class="kpi-change neutral">vs. Previous Period</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Market Share (2025)</div>
+            <div class="kpi-value">19.2%</div>
+            <div class="kpi-change">(-4.5%p)</div>
+            <div class="kpi-change neutral">vs. Previous Period</div>
+          </div>
+        </div>
+
+        <!-- 컴바인드 차트: SAM + Revenue 막대 + MarketShare 선 -->
+        <!-- viewBox 340x200, y_bottom=160, 차트높이=130px -->
+        <!-- Y좌 0~2500 → scale=130/2500=0.052, Y우 0~25% → scale=130/25=5.2 -->
+        <!-- X 4열 센터: 85,150,215,280, 각 그룹 막대 너비 24+24=48, 간격 -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-bar" style="background:#93C5FD"></div>SAM (억원)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#3B82F6"></div>Revenue (억원)</div>
+          <div class="legend-item"><div class="legend-line" style="background:#F97316"></div>Market Share % (우축)</div>
+        </div>
+        <div class="chart-area">
+          <!-- 좌축 0~2500(500간격), y_bottom=160, 차트높이=130 -->
+          <!-- y = 160 - val*130/2500 -->
+          <!-- SAM 2010→y=160-104.5=55.5, Revenue 386→y=160-20.1=139.9 -->
+          <!-- MarketShare 우축 15~25%, scale: 130/10=13/%, y=160-(val-15)*13 -->
+          <!-- 19.2 → 160-(19.2-15)*13=160-54.6=105.4 -->
+          <!-- 19.7 → 160-(19.7-15)*13=160-61.1=98.9 -->
+          <!-- 20.4 → 160-(20.4-15)*13=160-70.2=89.8 -->
+          <!-- 21.1 → 160-(21.1-15)*13=160-79.3=80.7 -->
+          <svg width="100%" height="200" viewBox="0 0 340 200">
+            <!-- 좌축 선 -->
+            <line x1="42" y1="22" x2="42" y2="162" stroke="#ddd" stroke-width="1"/>
+            <!-- 우축 선(점선) -->
+            <line x1="302" y1="22" x2="302" y2="162" stroke="#F97316" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
+
+            <!-- 좌축 레이블 -->
+            <text x="38" y="27" text-anchor="end" font-size="8" fill="#999">2500</text>
+            <text x="38" y="53" text-anchor="end" font-size="8" fill="#999">2000</text>
+            <text x="38" y="79" text-anchor="end" font-size="8" fill="#999">1500</text>
+            <text x="38" y="105" text-anchor="end" font-size="8" fill="#999">1000</text>
+            <text x="38" y="131" text-anchor="end" font-size="8" fill="#999">500</text>
+            <text x="38" y="163" text-anchor="end" font-size="8" fill="#999">0</text>
+            <text x="5" y="95" text-anchor="middle" font-size="8" fill="#888" transform="rotate(-90,5,95)">억원</text>
+
+            <!-- 우축 레이블 (MarketShare 15~25%) -->
+            <text x="307" y="27" text-anchor="start" font-size="8" fill="#F97316">25%</text>
+            <text x="307" y="92" text-anchor="start" font-size="8" fill="#F97316">20%</text>
+            <text x="307" y="157" text-anchor="start" font-size="8" fill="#F97316">15%</text>
+
+            <!-- 격자 -->
+            <line x1="42" y1="27" x2="302" y2="27" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="53" x2="302" y2="53" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="79" x2="302" y2="79" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="105" x2="302" y2="105" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="131" x2="302" y2="131" stroke="#F3F4F6" stroke-width="1"/>
+
+            <!-- 2025: SAM=2010 y=55.5, Revenue=386 y=139.9 -->
+            <!-- 막대 중심 x=85, SAM 좌측 x=64, Revenue 좌측 x=90, 너비=22 -->
+            <rect x="64" y="56" width="22" height="104" rx="2" fill="#93C5FD"/>
+            <rect x="88" y="140" width="22" height="20" rx="2" fill="#3B82F6"/>
+            <text x="75" y="52" text-anchor="middle" font-size="8" font-weight="600" fill="#60A5FA">2,010</text>
+            <text x="99" y="136" text-anchor="middle" font-size="8" font-weight="600" fill="#2563EB">386</text>
+
+            <!-- 2026: SAM=2132 y=49.1, Revenue=421 y=137.1 -->
+            <rect x="129" y="49" width="22" height="111" rx="2" fill="#93C5FD"/>
+            <rect x="153" y="137" width="22" height="23" rx="2" fill="#3B82F6"/>
+            <text x="140" y="45" text-anchor="middle" font-size="8" font-weight="600" fill="#60A5FA">2,132</text>
+            <text x="164" y="133" text-anchor="middle" font-size="8" font-weight="600" fill="#2563EB">421</text>
+
+            <!-- 2027: SAM=2264 y=42.3, Revenue=461 y=136.0 -->
+            <!-- y=160-2264*130/2500=160-117.7=42.3 -->
+            <!-- y=160-461*130/2500=160-23.97=136.0 -->
+            <rect x="194" y="42" width="22" height="118" rx="2" fill="#93C5FD"/>
+            <rect x="218" y="136" width="22" height="24" rx="2" fill="#3B82F6"/>
+            <text x="205" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="#60A5FA">2,264</text>
+            <text x="229" y="132" text-anchor="middle" font-size="8" font-weight="600" fill="#2563EB">461</text>
+
+            <!-- 2028: SAM=2402 y=35.1, Revenue=507 y=136.6 -->
+            <!-- y=160-2402*130/2500=160-124.9=35.1 -->
+            <!-- y=160-507*130/2500=160-26.4=133.6 -->
+            <rect x="259" y="35" width="22" height="125" rx="2" fill="#93C5FD"/>
+            <rect x="283" y="134" width="22" height="26" rx="2" fill="#3B82F6"/>
+            <text x="270" y="31" text-anchor="middle" font-size="8" font-weight="600" fill="#60A5FA">2,402</text>
+            <text x="294" y="130" text-anchor="middle" font-size="8" font-weight="600" fill="#2563EB">507</text>
+
+            <!-- MarketShare 선: 우축 15~25% → 130px, y=160-(val-15)*13 -->
+            <!-- 19.2→105.4, 19.7→98.9, 20.4→89.8, 21.1→80.7 -->
+            <!-- 각 그룹 중심 x: 85, 150, 215, 280 -->
+            <polyline points="85,105 150,99 215,90 280,81"
+              fill="none" stroke="#F97316" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="85" cy="105" r="4" fill="#F97316"/>
+            <circle cx="150" cy="99" r="4" fill="#F97316"/>
+            <circle cx="215" cy="90" r="4" fill="#F97316"/>
+            <circle cx="280" cy="81" r="4" fill="#F97316"/>
+            <!-- 시작/끝만 레이블 -->
+            <text x="85" y="100" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">19.2%</text>
+            <text x="285" y="76" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">21.1%</text>
+
+            <!-- X축 -->
+            <line x1="42" y1="162" x2="302" y2="162" stroke="#ddd" stroke-width="1"/>
+            <text x="85" y="174" text-anchor="middle" font-size="10" fill="#666">2025</text>
+            <text x="150" y="174" text-anchor="middle" font-size="10" fill="#666">2026</text>
+            <text x="215" y="174" text-anchor="middle" font-size="10" fill="#666">2027</text>
+            <text x="280" y="174" text-anchor="middle" font-size="10" fill="#666">2028</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 카드 1-2: Market & Revenue CAGR (External) -->
+      <div class="card">
+        <div class="card-title">Market &amp; Revenue CAGR (External)</div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- KPI 2개 -->
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-label">SAM CAGR ('25~'28)</div>
+            <div class="kpi-value">9.0%</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Revenue CAGR ('25~'28)</div>
+            <div class="kpi-value" style="color:#EF4444;">-1.6%</div>
+          </div>
+        </div>
+
+        <!-- 데이터 테이블 -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;">구분</th>
+              <th>2025</th>
+              <th>2026</th>
+              <th>2027</th>
+              <th>2028</th>
+              <th>CAGR('25~'28)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SAM (억원)</td>
+              <td>2,010</td>
+              <td>2,132</td>
+              <td>2,264</td>
+              <td>2,402</td>
+              <td class="cagr-col">6.1%</td>
+            </tr>
+            <tr>
+              <td>Revenue (억원)</td>
+              <td>386</td>
+              <td>421</td>
+              <td>461</td>
+              <td>507</td>
+              <td class="cagr-col">9.5%</td>
+            </tr>
+            <tr>
+              <td>Market Share</td>
+              <td>19.2%</td>
+              <td>19.7%</td>
+              <td>20.4%</td>
+              <td>21.1%</td>
+              <td style="color:#888; text-align:center;">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ Row 2 ══ -->
+    <div class="row">
+
+      <!-- 카드 2-1: SAM & Revenue Growth (External) -->
+      <div class="card">
+        <div class="card-title">SAM &amp; Revenue Growth (External) <span class="card-unit">%</span></div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- KPI 2개 -->
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-label">SAM Growth (2026)</div>
+            <div class="kpi-value">7.9%</div>
+            <div class="kpi-change neutral">(-2.1%p)</div>
+            <div class="kpi-change neutral">vs. Previous Period</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Revenue Growth (2026)</div>
+            <div class="kpi-value negative">-12.6%</div>
+            <div class="kpi-change neutral">(-23.2%p)</div>
+            <div class="kpi-change neutral">vs. Previous Period</div>
+          </div>
+        </div>
+
+        <!-- 다중 라인 차트: X=2026,2027,2028, Y=-10~20% -->
+        <!-- viewBox 0 0 300 150 -->
+        <!-- y_bottom=120, 차트높이=100, Y범위=30, scale=100/30=3.333/% -->
+        <!-- y=120-(val-(-10))*100/30 = 120-(val+10)*3.333 -->
+        <!-- 2026 SAM 3.9: 120-(13.9)*3.333=120-46.3=73.7 -->
+        <!-- 2026 Rev -2.0: 120-(8.0)*3.333=120-26.7=93.3 -->
+        <!-- 2027 SAM 7.9: 120-(17.9)*3.333=120-59.7=60.3 -->
+        <!-- 2027 Rev 9.5: 120-(19.5)*3.333=120-65.0=55.0 -->
+        <!-- 2028 SAM 14.0: 120-(24.0)*3.333=120-80=40 -->
+        <!-- 2028 Rev 10.1: 120-(20.1)*3.333=120-67=53 -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#F97316"></div>SAM Growth</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6"></div>Revenue Growth</div>
+        </div>
+        <div class="chart-area">
+          <svg width="100%" height="155" viewBox="0 0 300 155">
+            <line x1="42" y1="12" x2="42" y2="122" stroke="#ddd" stroke-width="1"/>
+            <!-- Y 레이블: 20,10,0,-10 -->
+            <text x="38" y="16" text-anchor="end" font-size="8" fill="#999">20%</text>
+            <text x="38" y="49" text-anchor="end" font-size="8" fill="#999">10%</text>
+            <text x="38" y="82" text-anchor="end" font-size="8" fill="#999">0%</text>
+            <text x="38" y="115" text-anchor="end" font-size="8" fill="#999">-10%</text>
+            <!-- 격자 -->
+            <line x1="42" y1="16" x2="265" y2="16" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="49" x2="265" y2="49" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="82" x2="265" y2="82" stroke="#ddd" stroke-width="1" stroke-dasharray="3,2"/>
+            <line x1="42" y1="115" x2="265" y2="115" stroke="#F3F4F6" stroke-width="1"/>
+
+            <!-- X 3개 센터: 90, 170, 250 -->
+            <!-- SAM 라인: 73.7, 60.3, 40 -->
+            <polyline points="90,74 170,60 250,40"
+              fill="none" stroke="#F97316" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="90" cy="74" r="4" fill="#F97316"/>
+            <circle cx="170" cy="60" r="4" fill="#F97316"/>
+            <circle cx="250" cy="40" r="4" fill="#F97316"/>
+            <text x="90" y="69" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">3.9%</text>
+            <text x="255" y="35" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">14.0%</text>
+
+            <!-- Revenue 라인: 93.3, 55.0, 53 -->
+            <polyline points="90,93 170,55 250,53"
+              fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="90" cy="93" r="4" fill="#8B5CF6"/>
+            <circle cx="170" cy="55" r="4" fill="#8B5CF6"/>
+            <circle cx="250" cy="53" r="4" fill="#8B5CF6"/>
+            <text x="90" y="103" text-anchor="middle" font-size="9" font-weight="600" fill="#8B5CF6">-2.0%</text>
+            <text x="255" y="48" text-anchor="middle" font-size="9" font-weight="600" fill="#8B5CF6">10.1%</text>
+
+            <!-- X축 -->
+            <line x1="42" y1="122" x2="265" y2="122" stroke="#ddd" stroke-width="1"/>
+            <text x="90" y="134" text-anchor="middle" font-size="10" fill="#666">2026</text>
+            <text x="170" y="134" text-anchor="middle" font-size="10" fill="#666">2027</text>
+            <text x="250" y="134" text-anchor="middle" font-size="10" fill="#666">2028</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 카드 2-2: Revenue Growth with S&M and R&D Ratio (Total) -->
+      <div class="card">
+        <div class="card-title">Revenue Growth / S&amp;M / R&amp;D Ratio (Total) <span class="card-unit">%</span></div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- KPI 3개 -->
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-label">Revenue Growth (2025)</div>
+            <div class="kpi-value negative" style="font-size:16px;">-12.6%</div>
+            <div class="kpi-change">(-23.2%p)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">S&amp;M Ratio (2025)</div>
+            <div class="kpi-value" style="font-size:16px;">24.6%</div>
+            <div class="kpi-change green">(+4.9%p)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">R&amp;D Ratio (2025)</div>
+            <div class="kpi-value" style="font-size:16px;">9.5%</div>
+            <div class="kpi-change green">(+1.0%p)</div>
+          </div>
+        </div>
+
+        <!-- 다중 라인 차트: X=2022,2023,2024,2025, Y=-20~30% -->
+        <!-- y_bottom=120, 차트높이=100, Y범위=50, scale=100/50=2/% -->
+        <!-- y=120-(val-(-20))*100/50 = 120-(val+20)*2 -->
+        <!-- R&D 2022 20.6: 120-(40.6)*2=120-81.2=38.8 -->
+        <!-- R&D 2023 15.2: 120-(35.2)*2=120-70.4=49.6 -->
+        <!-- R&D 2024 11.8: 120-(31.8)*2=120-63.6=56.4 -->
+        <!-- R&D 2025 9.5: 120-(29.5)*2=120-59=61 -->
+        <!-- S&M 2022 27.3: 120-(47.3)*2=120-94.6=25.4 -->
+        <!-- S&M 2023 26.1: 120-(46.1)*2=120-92.2=27.8 -->
+        <!-- S&M 2024 19.7: 120-(39.7)*2=120-79.4=40.6 -->
+        <!-- S&M 2025 24.6: 120-(44.6)*2=120-89.2=30.8 -->
+        <!-- Rev 2022 20.6: 38.8 -->
+        <!-- Rev 2023 8.3: 120-(28.3)*2=120-56.6=63.4 -->
+        <!-- Rev 2024 -0.6: 120-(19.4)*2=120-38.8=81.2 -->
+        <!-- Rev 2025 -12.6: 120-(7.4)*2=120-14.8=105.2 -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#F97316"></div>R&amp;D Ratio</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6"></div>S&amp;M Ratio</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#9CA3AF"></div>Revenue Growth</div>
+        </div>
+        <div class="chart-area">
+          <svg width="100%" height="155" viewBox="0 0 300 155">
+            <line x1="42" y1="12" x2="42" y2="122" stroke="#ddd" stroke-width="1"/>
+            <!-- Y 레이블: 30,20,10,0,-10,-20 -->
+            <text x="38" y="16" text-anchor="end" font-size="8" fill="#999">30%</text>
+            <text x="38" y="36" text-anchor="end" font-size="8" fill="#999">20%</text>
+            <text x="38" y="56" text-anchor="end" font-size="8" fill="#999">10%</text>
+            <text x="38" y="76" text-anchor="end" font-size="8" fill="#999">0%</text>
+            <text x="38" y="96" text-anchor="end" font-size="8" fill="#999">-10%</text>
+            <text x="38" y="116" text-anchor="end" font-size="8" fill="#999">-20%</text>
+            <!-- 격자 및 0% 기준선 -->
+            <line x1="42" y1="16" x2="265" y2="16" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="36" x2="265" y2="36" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="56" x2="265" y2="56" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="76" x2="265" y2="76" stroke="#ddd" stroke-width="1" stroke-dasharray="3,2"/>
+            <line x1="42" y1="96" x2="265" y2="96" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="116" x2="265" y2="116" stroke="#F3F4F6" stroke-width="1"/>
+
+            <!-- X 4개 센터: 75, 130, 185, 240 -->
+            <!-- R&D 라인 -->
+            <polyline points="75,39 130,50 185,56 240,61"
+              fill="none" stroke="#F97316" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="75" cy="39" r="4" fill="#F97316"/>
+            <circle cx="130" cy="50" r="4" fill="#F97316"/>
+            <circle cx="185" cy="56" r="4" fill="#F97316"/>
+            <circle cx="240" cy="61" r="4" fill="#F97316"/>
+            <text x="68" y="34" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">20.6%</text>
+            <text x="246" y="57" text-anchor="middle" font-size="9" font-weight="600" fill="#F97316">9.5%</text>
+
+            <!-- S&M 라인 -->
+            <polyline points="75,25 130,28 185,41 240,31"
+              fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="75" cy="25" r="4" fill="#8B5CF6"/>
+            <circle cx="130" cy="28" r="4" fill="#8B5CF6"/>
+            <circle cx="185" cy="41" r="4" fill="#8B5CF6"/>
+            <circle cx="240" cy="31" r="4" fill="#8B5CF6"/>
+            <text x="68" y="20" text-anchor="middle" font-size="9" font-weight="600" fill="#8B5CF6">27.3%</text>
+            <text x="246" y="26" text-anchor="middle" font-size="9" font-weight="600" fill="#8B5CF6">24.6%</text>
+
+            <!-- Revenue Growth 라인 -->
+            <polyline points="75,39 130,63 185,81 240,105"
+              fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="75" cy="39" r="4" fill="#9CA3AF"/>
+            <circle cx="130" cy="63" r="4" fill="#9CA3AF"/>
+            <circle cx="185" cy="81" r="4" fill="#9CA3AF"/>
+            <circle cx="240" cy="105" r="4" fill="#9CA3AF"/>
+            <text x="68" y="52" text-anchor="middle" font-size="9" font-weight="600" fill="#9CA3AF">20.6%</text>
+            <text x="246" y="118" text-anchor="middle" font-size="9" font-weight="600" fill="#9CA3AF">-12.6%</text>
+
+            <!-- X축 -->
+            <line x1="42" y1="122" x2="265" y2="122" stroke="#ddd" stroke-width="1"/>
+            <text x="75" y="134" text-anchor="middle" font-size="10" fill="#666">2022</text>
+            <text x="130" y="134" text-anchor="middle" font-size="10" fill="#666">2023</text>
+            <text x="185" y="134" text-anchor="middle" font-size="10" fill="#666">2024</text>
+            <text x="240" y="134" text-anchor="middle" font-size="10" fill="#666">2025</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Row 3 ══ -->
+    <div class="row">
+
+      <!-- 카드 3-1: SAM (External) by Cloud/On-prem -->
+      <div class="card">
+        <div class="card-title">SAM (External) by Cloud/On-prem <span class="card-unit">억원</span></div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- 스태커드 막대 차트 -->
+        <!-- viewBox 0 0 340 190 -->
+        <!-- Y 0~2500(표시 0~2000+여유), y_bottom=155, 차트높이=130 -->
+        <!-- scale=130/2500=0.052/억, y = 155 - val*0.052 -->
+        <!-- 막대 너비 40, 센터: 85,150,215,280 -->
+        <!-- 2025: SI/SM=600,솔=500,MSP=500,SaaS=410 합=2010 -->
+        <!-- 각 시리즈 y 좌표 (스태커드: 아래부터 쌓음) -->
+        <!-- SaaS 600+500+500=1600~2010 (410): h=410*0.052=21.3, y_top=155-2010*0.052=155-104.5=50.5 -->
+        <!-- MSP 600+500=1100~1600 (500): h=500*0.052=26, y_top=155-1600*0.052=155-83.2=71.8 -->
+        <!-- 솔루션 600~1100 (500): h=26, y_top=155-1100*0.052=155-57.2=97.8 -->
+        <!-- SI/SM 0~600 (600): h=600*0.052=31.2, y_top=155-600*0.052=155-31.2=123.8 -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-bar" style="background:#93C5FD"></div>On-prem (SI/SM)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#60A5FA"></div>On-prem (솔루션)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#3B82F6"></div>Cloud (MSP)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#2563EB"></div>Cloud (SaaS)</div>
+        </div>
+        <div class="chart-area">
+          <svg width="100%" height="190" viewBox="0 0 340 190">
+            <line x1="42" y1="18" x2="42" y2="158" stroke="#ddd" stroke-width="1"/>
+            <!-- Y 레이블: 0~2000 (500간격), scale=130/2500 -->
+            <!-- y=158-val*130/2500 -->
+            <text x="38" y="22" text-anchor="end" font-size="8" fill="#999">2,500</text>
+            <text x="38" y="49" text-anchor="end" font-size="8" fill="#999">2,000</text>
+            <text x="38" y="75" text-anchor="end" font-size="8" fill="#999">1,500</text>
+            <text x="38" y="101" text-anchor="end" font-size="8" fill="#999">1,000</text>
+            <text x="38" y="127" text-anchor="end" font-size="8" fill="#999">500</text>
+            <text x="38" y="160" text-anchor="end" font-size="8" fill="#999">0</text>
+            <!-- 격자 -->
+            <line x1="42" y1="22" x2="302" y2="22" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="49" x2="302" y2="49" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="75" x2="302" y2="75" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="101" x2="302" y2="101" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="127" x2="302" y2="127" stroke="#F3F4F6" stroke-width="1"/>
+
+            <!-- scale: 130/2500=0.052, y_bottom=158 -->
+            <!-- 2025 합=2010, 중심x=85 -->
+            <!-- SI/SM 600: y_top=158-600*0.052=158-31.2=126.8, h=31.2 -->
+            <!-- 솔루션 500: y_top=158-1100*0.052=158-57.2=100.8, h=26 -->
+            <!-- MSP 500: y_top=158-1600*0.052=158-83.2=74.8, h=26 -->
+            <!-- SaaS 410: y_top=158-2010*0.052=158-104.5=53.5, h=21.3 -->
+            <rect x="65" y="127" width="40" height="31" rx="1" fill="#93C5FD"/>
+            <rect x="65" y="101" width="40" height="26" rx="1" fill="#60A5FA"/>
+            <rect x="65" y="75" width="40" height="26" rx="1" fill="#3B82F6"/>
+            <rect x="65" y="54" width="40" height="21" rx="1" fill="#2563EB"/>
+            <text x="85" y="49" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">2,010</text>
+
+            <!-- 2026 합=2132, 중심x=150 -->
+            <!-- SI/SM 620: y_top=158-620*0.052=158-32.2=125.8, h=32.2 -->
+            <!-- 솔루션 520: y_top=158-1140*0.052=158-59.3=98.7, h=27 -->
+            <!-- MSP 540: y_top=158-1680*0.052=158-87.4=70.6, h=28.1 -->
+            <!-- SaaS 452: y_top=158-2132*0.052=158-110.9=47.1, h=23.5 -->
+            <rect x="130" y="126" width="40" height="32" rx="1" fill="#93C5FD"/>
+            <rect x="130" y="99" width="40" height="27" rx="1" fill="#60A5FA"/>
+            <rect x="130" y="71" width="40" height="28" rx="1" fill="#3B82F6"/>
+            <rect x="130" y="47" width="40" height="24" rx="1" fill="#2563EB"/>
+            <text x="150" y="42" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">2,132</text>
+
+            <!-- 2027 합=2264, 중심x=215 -->
+            <!-- SI/SM 650: h=33.8, y_top=158-33.8=124.2 -->
+            <!-- 솔루션 550: h=28.6, y_top=124.2-28.6=95.6 -->
+            <!-- MSP 580: h=30.2, y_top=95.6-30.2=65.4 -->
+            <!-- SaaS 484: h=25.2, y_top=65.4-25.2=40.2 -->
+            <rect x="195" y="124" width="40" height="34" rx="1" fill="#93C5FD"/>
+            <rect x="195" y="96" width="40" height="28" rx="1" fill="#60A5FA"/>
+            <rect x="195" y="66" width="40" height="30" rx="1" fill="#3B82F6"/>
+            <rect x="195" y="41" width="40" height="25" rx="1" fill="#2563EB"/>
+            <text x="215" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">2,264</text>
+
+            <!-- 2028 합=2402, 중심x=280 -->
+            <!-- SI/SM 680: h=35.4, y_top=158-35.4=122.6 -->
+            <!-- 솔루션 580: h=30.2, y_top=122.6-30.2=92.4 -->
+            <!-- MSP 630: h=32.8, y_top=92.4-32.8=59.6 -->
+            <!-- SaaS 512: h=26.6, y_top=59.6-26.6=33.0 -->
+            <rect x="260" y="123" width="40" height="35" rx="1" fill="#93C5FD"/>
+            <rect x="260" y="93" width="40" height="30" rx="1" fill="#60A5FA"/>
+            <rect x="260" y="60" width="40" height="33" rx="1" fill="#3B82F6"/>
+            <rect x="260" y="33" width="40" height="27" rx="1" fill="#2563EB"/>
+            <text x="280" y="28" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">2,402</text>
+
+            <!-- X축 -->
+            <line x1="42" y1="158" x2="302" y2="158" stroke="#ddd" stroke-width="1"/>
+            <text x="85" y="170" text-anchor="middle" font-size="10" fill="#666">2025</text>
+            <text x="150" y="170" text-anchor="middle" font-size="10" fill="#666">2026</text>
+            <text x="215" y="170" text-anchor="middle" font-size="10" fill="#666">2027</text>
+            <text x="280" y="170" text-anchor="middle" font-size="10" fill="#666">2028</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 카드 3-2: Revenue (External) by Cloud/On-prem -->
+      <div class="card">
+        <div class="card-title">Revenue (External) by Cloud/On-prem <span class="card-unit">억원</span></div>
+        <div class="ctrl-row">
+          <select class="ctrl-select"><option>국내</option><option>해외</option></select>
+          <select class="ctrl-select"><option>대외 전체</option><option>신규</option></select>
+        </div>
+
+        <!-- 스태커드 막대 차트: Y 0~600 (150 간격) -->
+        <!-- y_bottom=158, 차트높이=130, scale=130/600=0.2167/억 -->
+        <!-- 2025: SI/SM=80,솔=100,MSP=110,SaaS=96 합=386 -->
+        <!-- SI/SM 80: h=17.3, y_top=158-17.3=140.7 -->
+        <!-- 솔루션 100: h=21.7, y_top=140.7-21.7=119.0 -->
+        <!-- MSP 110: h=23.8, y_top=119.0-23.8=95.2 -->
+        <!-- SaaS 96: h=20.8, y_top=95.2-20.8=74.4 -->
+        <div class="legend">
+          <div class="legend-item"><div class="legend-bar" style="background:#93C5FD"></div>On-prem (SI/SM)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#60A5FA"></div>On-prem (솔루션)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#3B82F6"></div>Cloud (MSP)</div>
+          <div class="legend-item"><div class="legend-bar" style="background:#2563EB"></div>Cloud (SaaS)</div>
+        </div>
+        <div class="chart-area">
+          <svg width="100%" height="190" viewBox="0 0 340 190">
+            <line x1="42" y1="18" x2="42" y2="158" stroke="#ddd" stroke-width="1"/>
+            <!-- Y 레이블: 0~600 (150 간격), scale=130/600=0.2167 -->
+            <!-- y=158-val*0.2167 -->
+            <text x="38" y="22" text-anchor="end" font-size="8" fill="#999">600</text>
+            <text x="38" y="54" text-anchor="end" font-size="8" fill="#999">450</text>
+            <text x="38" y="86" text-anchor="end" font-size="8" fill="#999">300</text>
+            <text x="38" y="118" text-anchor="end" font-size="8" fill="#999">150</text>
+            <text x="38" y="160" text-anchor="end" font-size="8" fill="#999">0</text>
+            <!-- 격자 -->
+            <line x1="42" y1="22" x2="302" y2="22" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="54" x2="302" y2="54" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="86" x2="302" y2="86" stroke="#F3F4F6" stroke-width="1"/>
+            <line x1="42" y1="118" x2="302" y2="118" stroke="#F3F4F6" stroke-width="1"/>
+
+            <!-- scale: 130/600=0.2167, y_bottom=158 -->
+            <!-- 2025: 합=386, 중심x=85 -->
+            <!-- SI/SM 80: h=17.3 y_top=140.7 -->
+            <!-- 솔루션 100: h=21.7 y_top=119 -->
+            <!-- MSP 110: h=23.8 y_top=95.2 -->
+            <!-- SaaS 96: h=20.8 y_top=74.4 -->
+            <rect x="65" y="141" width="40" height="17" rx="1" fill="#93C5FD"/>
+            <rect x="65" y="119" width="40" height="22" rx="1" fill="#60A5FA"/>
+            <rect x="65" y="95" width="40" height="24" rx="1" fill="#3B82F6"/>
+            <rect x="65" y="74" width="40" height="21" rx="1" fill="#2563EB"/>
+            <text x="85" y="69" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">386</text>
+
+            <!-- 2026: 합=421, 중심x=150 -->
+            <!-- SI/SM 85: h=18.4 y_top=139.6 -->
+            <!-- 솔루션 108: h=23.4 y_top=116.2 -->
+            <!-- MSP 120: h=26.0 y_top=90.2 -->
+            <!-- SaaS 108: h=23.4 y_top=66.8 -->
+            <rect x="130" y="140" width="40" height="18" rx="1" fill="#93C5FD"/>
+            <rect x="130" y="116" width="40" height="24" rx="1" fill="#60A5FA"/>
+            <rect x="130" y="90" width="40" height="26" rx="1" fill="#3B82F6"/>
+            <rect x="130" y="67" width="40" height="23" rx="1" fill="#2563EB"/>
+            <text x="150" y="62" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">421</text>
+
+            <!-- 2027: 합=461, 중심x=215 -->
+            <!-- SI/SM 90: h=19.5 y_top=138.5 -->
+            <!-- 솔루션 118: h=25.6 y_top=112.9 -->
+            <!-- MSP 135: h=29.3 y_top=83.6 -->
+            <!-- SaaS 118: h=25.6 y_top=58.0 -->
+            <rect x="195" y="139" width="40" height="19" rx="1" fill="#93C5FD"/>
+            <rect x="195" y="113" width="40" height="26" rx="1" fill="#60A5FA"/>
+            <rect x="195" y="83" width="40" height="30" rx="1" fill="#3B82F6"/>
+            <rect x="195" y="58" width="40" height="25" rx="1" fill="#2563EB"/>
+            <text x="215" y="53" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">461</text>
+
+            <!-- 2028: 합=507, 중심x=280 -->
+            <!-- SI/SM 95: h=20.6 y_top=137.4 -->
+            <!-- 솔루션 130: h=28.2 y_top=109.2 -->
+            <!-- MSP 150: h=32.5 y_top=76.7 -->
+            <!-- SaaS 132: h=28.6 y_top=48.1 -->
+            <rect x="260" y="137" width="40" height="21" rx="1" fill="#93C5FD"/>
+            <rect x="260" y="109" width="40" height="28" rx="1" fill="#60A5FA"/>
+            <rect x="260" y="77" width="40" height="32" rx="1" fill="#3B82F6"/>
+            <rect x="260" y="48" width="40" height="29" rx="1" fill="#2563EB"/>
+            <text x="280" y="43" text-anchor="middle" font-size="8" font-weight="600" fill="#1E3A8A">507</text>
+
+            <!-- X축 -->
+            <line x1="42" y1="158" x2="302" y2="158" stroke="#ddd" stroke-width="1"/>
+            <text x="85" y="170" text-anchor="middle" font-size="10" fill="#666">2025</text>
+            <text x="150" y="170" text-anchor="middle" font-size="10" fill="#666">2026</text>
+            <text x="215" y="170" text-anchor="middle" font-size="10" fill="#666">2027</text>
+            <text x="280" y="170" text-anchor="middle" font-size="10" fill="#666">2028</text>
+          </svg>
+        </div>
+      </div>
+
+    </div><!-- /Row 3 -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</body>
+</html>

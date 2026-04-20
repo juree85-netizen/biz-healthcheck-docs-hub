@@ -7,6 +7,7 @@ description: 와이어프레임 및 개발 요청서 HTML 파일 링크
 
 - [효율/수익 지표 개발 요청서](/html/efficiency_profit_dev_request.html)
 - [효율/수익 와이어프레임](/html/efficiency_profit_wireframe.html)
+- [재무 (시장) 와이어프레임](/html/market_wireframe.html)
 - [VoC 대시보드 와이어프레임](/html/voc_dashboard_wireframe.html)
 - [VoC 인터페이스 개발 요청서](/html/voc_dev_request.html)
 
