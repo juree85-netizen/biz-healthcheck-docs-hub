@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파일 업로드</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: #f5f6fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 48px 40px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+  }
+  h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 8px; }
+  .sub { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  .file-label {
+    display: block;
+    border: 2px dashed #c5cae9;
+    border-radius: 10px;
+    padding: 32px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 16px;
+  }
+  .file-label:hover { border-color: #3949ab; background: #f0f2ff; }
+  .file-label .icon { font-size: 36px; display: block; margin-bottom: 8px; }
+  .file-label span { font-size: 14px; color: #888; }
+  input[type=file] { display: none; }
+
+  #file-name {
+    font-size: 13px;
+    color: #3949ab;
+    margin-bottom: 20px;
+    min-height: 20px;
+    font-weight: 600;
+  }
+
+  button {
+    background: #3949ab;
+    color: #fff;
+    border: none;
+    padding: 13px 0;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  button:hover { background: #2c3a8c; }
+
+  #msg {
+    margin-top: 20px;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: none;
+  }
+  .success { background: #e8f5e9; color: #2e7d32; display: block !important; }
+  .error   { background: #fdecea; color: #c62828; display: block !important; }
+
+  .back { margin-top: 24px; font-size: 13px; }
+  .back a { color: #3949ab; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>파일 업로드</h2>
+  <p class="sub">시안 이미지, PDF 등 파일을 서버로 전송합니다</p>
+
+  <label class="file-label" for="fileInput">
+    <span class="icon">📂</span>
+    <span>클릭해서 파일 선택</span>
+  </label>
+  <input type="file" id="fileInput">
+
+  <div id="file-name">파일을 선택하세요</div>
+
+  <button id="uploadBtn" onclick="doUpload()">업로드</button>
+  <div id="msg"></div>
+
+  <div class="back"><a href="/">← 문서허브로 돌아가기</a></div>
+</div>
+
+<script>
+  document.getElementById('fileInput').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      document.getElementById('file-name').textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    }
+  });
+
+  async function doUpload() {
+    const fileInput = document.getElementById('fileInput');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('uploadBtn');
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      msg.className = 'error';
+      msg.textContent = '⚠️ 파일을 먼저 선택해주세요.';
+      return;
+    }
+
+    const file = fileInput.files[0];
+    btn.textContent = '업로드 중...';
+    btn.disabled = true;
+    msg.className = '';
+    msg.style.display = 'none';
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      const res = await fetch('/upload', { method: 'POST', body: fd });
+      const text = await res.text();
+      msg.className = res.ok ? 'success' : 'error';
+      msg.textContent = text;
+    } catch (e) {
+      msg.className = 'error';
+      msg.textContent = '❌ 업로드 실패: ' + e.message;
+    }
+
+    btn.textContent = '업로드';
+    btn.disabled = false;
+  }
+</script>
+</body>
+</html>

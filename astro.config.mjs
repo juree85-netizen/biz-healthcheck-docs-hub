@@ -19,6 +19,11 @@ export default defineConfig({
 					label: 'HTML 문서 (와이어프레임/요청서)',
 					autogenerate: { directory: 'html-docs' },
 				},
+				{
+					label: '📂 파일 업로드',
+					link: '/html/upload.html',
+					attrs: { target: '_blank' },
+				},
 			],
 		}),
 	],
