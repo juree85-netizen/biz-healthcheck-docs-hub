@@ -431,96 +431,95 @@ body {
 
             <!-- 누적 막대 (각 분기별 4색 누적)
                  bottom y = 210, top y = 210 - totalH
-                 각 세그먼트: Won(40%), InProcess(30%), Drop(15%), Lost(15%)
+                 각 세그먼트: Won(30%), InProcess(30%), Drop(20%), Lost(20%)
                  순서: 하단부터 Lost -> Drop -> InProcess -> Won
-                 idx0 22.4Q x=48 total_h=102.6
-                   Lost  h=15.4  y=207.3~192
-                   Drop  h=15.4  y=192~177
-                   InProc h=30.8 y=177~146
-                   Won   h=41.0  y=146~107.4
+                 Lost  h = totalH * 0.20,  y_lost = 210 - h_lost
+                 Drop  h = totalH * 0.20,  y_drop = y_lost - h_drop
+                 InProc h = totalH * 0.30, y_inp  = y_drop - h_inp
+                 Won   h = totalH * 0.30,  y_won  = 210 - totalH
             -->
-            <!-- 22.4Q: 6155, h=102.6 -->
-            <rect x="48"  y="194.6" width="22" height="15.4" fill="#FF9800" rx="0"/>
-            <rect x="48"  y="179.2" width="22" height="15.4" fill="#adb5bd" rx="0"/>
-            <rect x="48"  y="148.4" width="22" height="30.8" fill="#93b3fd" rx="0"/>
-            <rect x="48"  y="107.4" width="22" height="41.0" fill="#5c7cfa" rx="2"/>
+            <!-- 22.4Q: 6155, h=102.6, Lost=20.5, Drop=20.5, InProc=30.8, Won=30.8 -->
+            <rect x="48"  y="189.5" width="22" height="20.5" fill="#FF9800" rx="0"/>
+            <rect x="48"  y="169.0" width="22" height="20.5" fill="#adb5bd" rx="0"/>
+            <rect x="48"  y="138.2" width="22" height="30.8" fill="#93b3fd" rx="0"/>
+            <rect x="48"  y="107.4" width="22" height="30.8" fill="#5c7cfa" rx="2"/>
             <text x="59"  y="103"  text-anchor="middle" font-size="8" font-weight="700" fill="#333">6,155</text>
 
-            <!-- 23.1Q: 6400, h=106.7 -->
-            <rect x="85"  y="193.3" width="22" height="16.0" fill="#FF9800" rx="0"/>
-            <rect x="85"  y="177.3" width="22" height="16.0" fill="#adb5bd" rx="0"/>
-            <rect x="85"  y="145.3" width="22" height="32.0" fill="#93b3fd" rx="0"/>
-            <rect x="85"  y="103.3" width="22" height="42.0" fill="#5c7cfa" rx="2"/>
+            <!-- 23.1Q: 6400, h=106.7, Lost=21.3, Drop=21.3, InProc=32.0, Won=32.0 -->
+            <rect x="85"  y="188.7" width="22" height="21.3" fill="#FF9800" rx="0"/>
+            <rect x="85"  y="167.4" width="22" height="21.3" fill="#adb5bd" rx="0"/>
+            <rect x="85"  y="135.4" width="22" height="32.0" fill="#93b3fd" rx="0"/>
+            <rect x="85"  y="103.3" width="22" height="32.0" fill="#5c7cfa" rx="2"/>
             <text x="96"  y="99"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">6,400</text>
 
-            <!-- 23.2Q: 6600, h=110 -->
-            <rect x="123" y="193.5" width="22" height="16.5" fill="#FF9800" rx="0"/>
-            <rect x="123" y="177.0" width="22" height="16.5" fill="#adb5bd" rx="0"/>
-            <rect x="123" y="144.0" width="22" height="33.0" fill="#93b3fd" rx="0"/>
-            <rect x="123" y="100.0" width="22" height="44.0" fill="#5c7cfa" rx="2"/>
+            <!-- 23.2Q: 6600, h=110, Lost=22.0, Drop=22.0, InProc=33.0, Won=33.0 -->
+            <rect x="123" y="188.0" width="22" height="22.0" fill="#FF9800" rx="0"/>
+            <rect x="123" y="166.0" width="22" height="22.0" fill="#adb5bd" rx="0"/>
+            <rect x="123" y="133.0" width="22" height="33.0" fill="#93b3fd" rx="0"/>
+            <rect x="123" y="100.0" width="22" height="33.0" fill="#5c7cfa" rx="2"/>
             <text x="134" y="96"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">6,600</text>
 
-            <!-- 23.3Q: 6800, h=113.3 -->
-            <rect x="160" y="193.0" width="22" height="17.0" fill="#FF9800" rx="0"/>
-            <rect x="160" y="176.0" width="22" height="17.0" fill="#adb5bd" rx="0"/>
-            <rect x="160" y="142.0" width="22" height="34.0" fill="#93b3fd" rx="0"/>
-            <rect x="160" y="96.7"  width="22" height="45.3" fill="#5c7cfa" rx="2"/>
+            <!-- 23.3Q: 6800, h=113.3, Lost=22.7, Drop=22.7, InProc=34.0, Won=34.0 -->
+            <rect x="160" y="187.3" width="22" height="22.7" fill="#FF9800" rx="0"/>
+            <rect x="160" y="164.6" width="22" height="22.7" fill="#adb5bd" rx="0"/>
+            <rect x="160" y="130.7" width="22" height="34.0" fill="#93b3fd" rx="0"/>
+            <rect x="160" y="96.7"  width="22" height="34.0" fill="#5c7cfa" rx="2"/>
             <text x="171" y="92"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">6,800</text>
 
-            <!-- 23.4Q: 7200, h=120 -->
-            <rect x="198" y="192.0" width="22" height="18.0" fill="#FF9800" rx="0"/>
-            <rect x="198" y="174.0" width="22" height="18.0" fill="#adb5bd" rx="0"/>
-            <rect x="198" y="138.0" width="22" height="36.0" fill="#93b3fd" rx="0"/>
-            <rect x="198" y="90.0"  width="22" height="48.0" fill="#5c7cfa" rx="2"/>
+            <!-- 23.4Q: 7200, h=120, Lost=24.0, Drop=24.0, InProc=36.0, Won=36.0 -->
+            <rect x="198" y="186.0" width="22" height="24.0" fill="#FF9800" rx="0"/>
+            <rect x="198" y="162.0" width="22" height="24.0" fill="#adb5bd" rx="0"/>
+            <rect x="198" y="126.0" width="22" height="36.0" fill="#93b3fd" rx="0"/>
+            <rect x="198" y="90.0"  width="22" height="36.0" fill="#5c7cfa" rx="2"/>
             <text x="209" y="86"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">7,200</text>
 
-            <!-- 24.1Q: 7600, h=126.7 -->
-            <rect x="235" y="191.0" width="22" height="19.0" fill="#FF9800" rx="0"/>
-            <rect x="235" y="172.0" width="22" height="19.0" fill="#adb5bd" rx="0"/>
-            <rect x="235" y="134.0" width="22" height="38.0" fill="#93b3fd" rx="0"/>
-            <rect x="235" y="83.3"  width="22" height="50.7" fill="#5c7cfa" rx="2"/>
+            <!-- 24.1Q: 7600, h=126.7, Lost=25.3, Drop=25.3, InProc=38.0, Won=38.0 -->
+            <rect x="235" y="184.7" width="22" height="25.3" fill="#FF9800" rx="0"/>
+            <rect x="235" y="159.4" width="22" height="25.3" fill="#adb5bd" rx="0"/>
+            <rect x="235" y="121.4" width="22" height="38.0" fill="#93b3fd" rx="0"/>
+            <rect x="235" y="83.3"  width="22" height="38.0" fill="#5c7cfa" rx="2"/>
             <text x="246" y="79"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">7,600</text>
 
-            <!-- 24.2Q: 7900, h=131.7 -->
-            <rect x="273" y="190.2" width="22" height="19.8" fill="#FF9800" rx="0"/>
-            <rect x="273" y="170.4" width="22" height="19.8" fill="#adb5bd" rx="0"/>
-            <rect x="273" y="130.9" width="22" height="39.5" fill="#93b3fd" rx="0"/>
-            <rect x="273" y="78.3"  width="22" height="52.6" fill="#5c7cfa" rx="2"/>
+            <!-- 24.2Q: 7900, h=131.7, Lost=26.3, Drop=26.3, InProc=39.5, Won=39.5 -->
+            <rect x="273" y="183.7" width="22" height="26.3" fill="#FF9800" rx="0"/>
+            <rect x="273" y="157.4" width="22" height="26.3" fill="#adb5bd" rx="0"/>
+            <rect x="273" y="117.9" width="22" height="39.5" fill="#93b3fd" rx="0"/>
+            <rect x="273" y="78.3"  width="22" height="39.5" fill="#5c7cfa" rx="2"/>
             <text x="284" y="74"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">7,900</text>
 
-            <!-- 24.3Q: 8100, h=135 -->
-            <rect x="310" y="189.8" width="22" height="20.3" fill="#FF9800" rx="0"/>
-            <rect x="310" y="169.5" width="22" height="20.3" fill="#adb5bd" rx="0"/>
-            <rect x="310" y="129.0" width="22" height="40.5" fill="#93b3fd" rx="0"/>
-            <rect x="310" y="75.0"  width="22" height="54.0" fill="#5c7cfa" rx="2"/>
+            <!-- 24.3Q: 8100, h=135, Lost=27.0, Drop=27.0, InProc=40.5, Won=40.5 -->
+            <rect x="310" y="183.0" width="22" height="27.0" fill="#FF9800" rx="0"/>
+            <rect x="310" y="156.0" width="22" height="27.0" fill="#adb5bd" rx="0"/>
+            <rect x="310" y="115.5" width="22" height="40.5" fill="#93b3fd" rx="0"/>
+            <rect x="310" y="75.0"  width="22" height="40.5" fill="#5c7cfa" rx="2"/>
             <text x="321" y="71"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">8,100</text>
 
-            <!-- 24.4Q: 8500, h=141.7 -->
-            <rect x="348" y="188.7" width="22" height="21.3" fill="#FF9800" rx="0"/>
-            <rect x="348" y="167.4" width="22" height="21.3" fill="#adb5bd" rx="0"/>
-            <rect x="348" y="124.8" width="22" height="42.6" fill="#93b3fd" rx="0"/>
-            <rect x="348" y="68.3"  width="22" height="56.5" fill="#5c7cfa" rx="2"/>
+            <!-- 24.4Q: 8500, h=141.7, Lost=28.3, Drop=28.3, InProc=42.5, Won=42.5 -->
+            <rect x="348" y="181.7" width="22" height="28.3" fill="#FF9800" rx="0"/>
+            <rect x="348" y="153.4" width="22" height="28.3" fill="#adb5bd" rx="0"/>
+            <rect x="348" y="110.9" width="22" height="42.5" fill="#93b3fd" rx="0"/>
+            <rect x="348" y="68.3"  width="22" height="42.5" fill="#5c7cfa" rx="2"/>
             <text x="359" y="64"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">8,500</text>
 
-            <!-- 25.1Q: 8900, h=148.3 -->
-            <rect x="385" y="187.5" width="22" height="22.3" fill="#FF9800" rx="0"/>
-            <rect x="385" y="165.2" width="22" height="22.3" fill="#adb5bd" rx="0"/>
-            <rect x="385" y="120.6" width="22" height="44.6" fill="#93b3fd" rx="0"/>
-            <rect x="385" y="61.7"  width="22" height="58.9" fill="#5c7cfa" rx="2"/>
+            <!-- 25.1Q: 8900, h=148.3, Lost=29.7, Drop=29.7, InProc=44.5, Won=44.5 -->
+            <rect x="385" y="180.3" width="22" height="29.7" fill="#FF9800" rx="0"/>
+            <rect x="385" y="150.7" width="22" height="29.7" fill="#adb5bd" rx="0"/>
+            <rect x="385" y="106.2" width="22" height="44.5" fill="#93b3fd" rx="0"/>
+            <rect x="385" y="61.7"  width="22" height="44.5" fill="#5c7cfa" rx="2"/>
             <text x="396" y="57"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">8,900</text>
 
-            <!-- 25.2Q: 9300, h=155 -->
-            <rect x="423" y="186.8" width="22" height="23.3" fill="#FF9800" rx="0"/>
-            <rect x="423" y="163.5" width="22" height="23.3" fill="#adb5bd" rx="0"/>
-            <rect x="423" y="117.5" width="22" height="46.0" fill="#93b3fd" rx="0"/>
-            <rect x="423" y="55.0"  width="22" height="62.5" fill="#5c7cfa" rx="2"/>
+            <!-- 25.2Q: 9300, h=155, Lost=31.0, Drop=31.0, InProc=46.5, Won=46.5 -->
+            <rect x="423" y="179.0" width="22" height="31.0" fill="#FF9800" rx="0"/>
+            <rect x="423" y="148.0" width="22" height="31.0" fill="#adb5bd" rx="0"/>
+            <rect x="423" y="101.5" width="22" height="46.5" fill="#93b3fd" rx="0"/>
+            <rect x="423" y="55.0"  width="22" height="46.5" fill="#5c7cfa" rx="2"/>
             <text x="434" y="51"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">9,300</text>
 
-            <!-- 25.3Q: 9811, h=163.5 -->
-            <rect x="460" y="185.5" width="22" height="24.5" fill="#FF9800" rx="0"/>
-            <rect x="460" y="161.0" width="22" height="24.5" fill="#adb5bd" rx="0"/>
-            <rect x="460" y="112.5" width="22" height="48.5" fill="#93b3fd" rx="0"/>
-            <rect x="460" y="46.5"  width="22" height="66.0" fill="#5c7cfa" rx="2"/>
+            <!-- 25.3Q: 9811, h=163.5, Lost=32.7, Drop=32.7, InProc=49.1, Won=49.1 -->
+            <rect x="460" y="177.3" width="22" height="32.7" fill="#FF9800" rx="0"/>
+            <rect x="460" y="144.6" width="22" height="32.7" fill="#adb5bd" rx="0"/>
+            <rect x="460" y="95.6"  width="22" height="49.1" fill="#93b3fd" rx="0"/>
+            <rect x="460" y="46.5"  width="22" height="49.1" fill="#5c7cfa" rx="2"/>
             <text x="471" y="42"   text-anchor="middle" font-size="8" font-weight="700" fill="#333">9,811</text>
 
             <!-- X축 레이블 -->
