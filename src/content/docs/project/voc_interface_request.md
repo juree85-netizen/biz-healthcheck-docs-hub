@@ -5,6 +5,8 @@ title: VoC 데이터 인터페이스 요청서
 # VoC 데이터 인터페이스 요청서
 #### (기존 solution_if_voc 유지 + 신규 테이블 및 API 추가)
 
+**시각화 버전 →** [HTML 문서로 보기](/docs-hub/dist/html/voc_dev_request.html)
+
 ---
 
 ## 0. 배경

@@ -4,6 +4,8 @@ title: 효율/수익 지표 개발 요청서
 
 > 대상 시스템: 사업건전성 대시보드 | 작성: 솔루션사업부 기획팀 | 작성일: 2026-04-20 | v0.3
 
+**시각화 버전 →** [HTML 문서로 보기](/docs-hub/dist/html/efficiency_profit_dev_request.html)
+
 ---
 
 ## 1. 요청 배경
