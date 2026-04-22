@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
+	base: '/docs-hub/dist/',
 	integrations: [
 		starlight({
 			title: 'Biz Healthcheck Dashboard',
