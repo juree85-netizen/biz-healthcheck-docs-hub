@@ -4,7 +4,7 @@ title: 사업건전성 대시보드 추진 배경 및 목적
 
 > 작성: 솔루션사업부 기획팀 | 작성일: 2026-04-21 | 내부보고용 확정본
 
-**시각화 버전 →** [HTML 문서로 보기](/html/dashboard_background_purpose.html)
+**시각화 버전 →** [HTML 문서로 보기](/docs-hub/dist/html/dashboard_background_purpose.html)
 
 ---
 
